@@ -1,0 +1,144 @@
+'use client';
+
+import { Image } from '@nextui-org/react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { RiShareBoxFill } from 'react-icons/ri';
+
+import { useMonthlyStreak } from '@/app/api/Streak/services';
+import { Calendar } from '@/app/components/ui/calendar';
+
+export default function ActivityPage() {
+  const [selectedDates, setSelectedDates] = useState<Date[]>();
+  const {
+    data: monthlyStreakData,
+    isLoading: isMonthlyStreakLoading,
+    isError: isMonthlyStreakError,
+    error: monthlyStreakError,
+  } = useMonthlyStreak();
+
+  useEffect(() => {
+    if (!isMonthlyStreakLoading && monthlyStreakData) {
+      const newSelectedDates: Date[] = monthlyStreakData.streakMonth
+        .filter((day) => day.isStreak)
+        .map(
+          (day) =>
+            new Date(
+              `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day.day}`
+            )
+        );
+      setSelectedDates(newSelectedDates);
+    }
+  }, [isMonthlyStreakLoading, monthlyStreakData]);
+
+  if (isMonthlyStreakLoading) return <div>Loading...</div>;
+  if (isMonthlyStreakError)
+    return <div>Error: {monthlyStreakError.message}</div>;
+
+  return (
+    <section className="relative flex flex-col">
+      <Image src="/assets/app/head.png" width={646} height={146} />
+      <div className="flex flex-col p-5">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold">Aktivitas</h1>
+          <Link href="/">
+            <RiShareBoxFill className="text-2xl" />
+          </Link>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="col-span-1 grid place-items-center rounded-xl border py-3">
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="26"
+                  viewBox="0 0 25 26"
+                  fill="none"
+                >
+                  <path
+                    d="M12.7763 24.4759C12.7763 24.4759 5.57083 24.5552 5.01624 18.2564C4.74509 13.7619 7.35372 12.5643 7.2088 8.25158C7.2047 8.12849 7.34552 8.05615 7.44378 8.13042C7.89939 8.47499 8.8569 9.32665 9.25223 10.6415C9.29636 10.7881 9.50746 10.7764 9.53592 10.626C9.91702 8.61098 11.4254 3.58145 17.1425 1.47786C17.2711 1.4306 17.3883 1.5719 17.3185 1.69005C16.707 2.72509 15.0709 5.81994 16.1472 7.67915C16.9233 9.01981 17.2666 9.92753 17.4173 10.4438C17.458 10.5829 17.654 10.5846 17.6976 10.4463L18.0063 9.46529C18.053 9.317 18.268 9.33364 18.291 9.48736C18.7125 12.3026 20.2509 14.8386 20.1074 17.7809C20.0212 19.5469 19.4802 21.3492 18.1875 22.6122C16.7587 24.0081 14.7157 24.4594 12.7763 24.4759Z"
+                    fill="#EC6E45"
+                  />
+                  <path
+                    d="M10.8747 15.81C10.9842 15.8966 11.1407 15.7967 11.1081 15.6609C10.3733 12.5934 12.2641 10.4101 13.0702 9.64395C13.1719 9.54714 13.3393 9.63491 13.3156 9.77344C13.0592 11.2781 13.7182 12.6909 14.8397 13.7402C15.7533 14.5949 15.7461 15.625 15.6824 16.0965C15.6667 16.213 15.788 16.2976 15.8938 16.246C16.5701 15.9164 17.0357 15.304 17.2605 14.9542C17.3267 14.8511 17.4816 14.8704 17.5221 14.986C18.4416 17.6135 18.8493 22.2916 12.932 22.2734C6.7623 22.2545 7.74923 17.7809 8.14528 16.5925C8.4186 15.7727 8.12635 15.179 7.91874 14.8897C7.85039 14.7944 7.91344 14.6631 8.03039 14.6564C9.15874 14.5907 10.3085 15.3625 10.8747 15.81Z"
+                    fill="#F8D462"
+                  />
+                </svg>
+                <h3 className="text-2xl font-bold">
+                  {monthlyStreakData?.streakTotal}
+                </h3>
+              </div>
+              <p className="text-xs text-[#A1A1AA]">Streak Harian</p>
+            </div>
+          </div>
+          <div className="col-span-1 grid place-items-center rounded-xl border py-3">
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 28 28"
+                  fill="none"
+                >
+                  <path
+                    d="M18.8884 2.33325H9.11171C4.86504 2.33325 2.33337 4.86492 2.33337 9.11159V18.8766C2.33337 23.1349 4.86504 25.6666 9.11171 25.6666H18.8767C23.1234 25.6666 25.655 23.1349 25.655 18.8883V9.11159C25.6667 4.86492 23.135 2.33325 18.8884 2.33325ZM14 21.2916C11.9117 21.2916 10.2784 20.2533 9.17004 19.2266V20.0549C9.17004 20.5333 8.77337 20.9299 8.29504 20.9299C7.81671 20.9299 7.42004 20.5333 7.42004 20.0549V16.8466C7.42004 16.3683 7.81671 15.9716 8.29504 15.9716H11.1884C11.6667 15.9716 12.0634 16.3683 12.0634 16.8466C12.0634 17.3249 11.6667 17.7216 11.1884 17.7216H10.1384C11.0017 18.5849 12.3434 19.5416 14 19.5416C17.0567 19.5416 19.5417 17.0566 19.5417 13.9999C19.5417 13.5216 19.9384 13.1249 20.4167 13.1249C20.895 13.1249 21.2917 13.5216 21.2917 13.9999C21.2917 18.0249 18.025 21.2916 14 21.2916ZM21.2917 11.1299C21.2917 11.1649 21.2917 11.1999 21.2917 11.2233C21.28 11.3516 21.245 11.4683 21.1867 11.5733C21.1284 11.6783 21.0467 11.7716 20.9417 11.8533C20.86 11.9116 20.7667 11.9583 20.6617 11.9933C20.58 12.0166 20.4984 12.0283 20.4167 12.0283H17.5817C17.1034 12.0283 16.7067 11.6316 16.7067 11.1533C16.7067 10.6749 17.1034 10.2783 17.5817 10.2783H18.55C17.6167 9.41492 16.1117 8.45825 14.0234 8.45825C10.9667 8.45825 8.48171 10.9433 8.48171 13.9999C8.48171 14.4783 8.08504 14.8749 7.60671 14.8749C7.12837 14.8749 6.70837 14.4783 6.70837 13.9999C6.70837 9.97492 9.97504 6.70825 14 6.70825C16.5084 6.70825 18.3517 7.79325 19.5417 8.83159V7.94492C19.5417 7.46659 19.9384 7.06992 20.4167 7.06992C20.895 7.06992 21.2917 7.46659 21.2917 7.94492V11.1299Z"
+                    fill="#72C287"
+                  />
+                </svg>
+                <h3 className="text-2xl font-bold">
+                  {monthlyStreakData?.todayPlayTotal}
+                </h3>
+              </div>
+              <p className="text-xs text-[#A1A1AA]">Repetisi Materi</p>
+            </div>
+          </div>
+          <div className="col-span-2 grid place-items-center rounded-xl border py-3">
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 28 28"
+                  fill="none"
+                >
+                  <path
+                    d="M18.6667 15.0499V19.9499C18.6667 24.0333 17.0334 25.6666 12.95 25.6666H8.05004C3.96671 25.6666 2.33337 24.0333 2.33337 19.9499V15.0499C2.33337 10.9666 3.96671 9.33325 8.05004 9.33325H12.95C17.0334 9.33325 18.6667 10.9666 18.6667 15.0499Z"
+                    fill="#237AC1"
+                  />
+                  <path
+                    d="M15.05 2.91659H19.95C21.9341 2.91659 23.1712 3.31698 23.9271 4.07281C24.6829 4.82864 25.0833 6.06579 25.0833 8.04992V12.9499C25.0833 14.6954 24.7705 15.8625 24.1805 16.6287C23.6048 17.3763 22.6873 17.8406 21.2384 18.0056C20.9806 18.035 20.7083 17.8191 20.7083 17.4744V15.0499C20.7083 12.5209 20.122 10.547 18.7874 9.21244C17.4529 7.87791 15.479 7.29159 12.95 7.29159H10.5255C10.1808 7.29159 9.96489 7.01928 9.99426 6.76144C10.1593 5.31255 10.6236 4.39507 11.3712 3.81937C12.1373 3.22936 13.3044 2.91659 15.05 2.91659Z"
+                    fill="#237AC1"
+                    stroke="#237AC1"
+                    strokeWidth="1.16667"
+                  />
+                </svg>
+                <h3 className="text-2xl font-bold">
+                  {monthlyStreakData?.flashcardTotal}
+                </h3>
+              </div>
+              <p className="text-xs text-[#A1A1AA]">Flash Cards</p>
+            </div>
+          </div>
+        </div>
+        <Calendar
+          mode="multiple"
+          selected={selectedDates}
+          className="mt-6 w-full rounded-md border"
+        />
+        <div className="mt-4 flex justify-center gap-4">
+          <div className="flex items-center gap-1">
+            <div className="h-5 w-5 rounded bg-[#6699CC]" />
+            <p className="text-xs font-medium">Hari Ini</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <Image src="/assets/app/fire.png" width={20} height={20} />
+            <p className="text-xs font-medium">Streak</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

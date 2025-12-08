@@ -1,0 +1,76 @@
+/* eslint-disable no-console */
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+
+import login from './action';
+import type { CreateUserType, LoginUserType } from './model';
+
+const baseUrl = process.env.BASE_URL;
+
+const registration = async (
+  credentials: Omit<CreateUserType, 'confirm_password'>
+): Promise<unknown> => {
+  const response = await axios.post(`${baseUrl}/auth/register`, credentials);
+  return response.data.data;
+};
+
+export const useLogin = () => {
+  return useMutation({
+    mutationFn: (credentials: LoginUserType) => login(credentials),
+    onError: (error: Error) => {
+      console.error(error);
+    },
+  });
+};
+
+export const useRegister = () => {
+  return useMutation({
+    mutationFn: (payload: Omit<CreateUserType, 'confirm_password'>) =>
+      registration(payload),
+    onError: (error: Error) => {
+      console.error(error);
+    },
+  });
+};
+
+export interface User {
+  user_id: number;
+  nama: string;
+  email: string;
+  role: string;
+  dateOfBirth: string;
+  educationLevel: string;
+}
+
+interface UserData {
+  user_id: number;
+  nama: string;
+  email: string;
+  role: string;
+  dateOfBirth: string;
+  educationLevel: string;
+}
+
+export const useUserData = (): UserData => {
+  const defaultUser: UserData = {
+    user_id: 0,
+    nama: 'User',
+    email: '',
+    role: '',
+    dateOfBirth: '',
+    educationLevel: '',
+  };
+
+  if (typeof window !== 'undefined') {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      try {
+        return JSON.parse(userString);
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }
+
+  return defaultUser;
+};

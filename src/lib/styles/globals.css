@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-4xl font-bold md:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl font-bold md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl font-bold md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl font-bold;
+  }
+
+  h5 {
+    @apply text-lg font-bold;
+  }
+
+  .wrapper {
+    @apply mx-auto p-6 sm:p-8;
+    max-width: 48rem;
+  }
+
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 2px;
+    opacity: 0.6;
+    filter: invert(0.8);
+  }
+}
+
+.content {
+  max-width: 430px;
+  margin: auto;
+  background: white;
+  height: 100dvh;
+}
+
+* {
+  margin: 0;
+  font-family: var(--font-inter);
+}
+
+html {
+  background-color: #f0f0f0;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.container::-webkit-scrollbar-thumb {
+  display: none;
+}
+.text-streak {
+  -webkit-text-stroke: 4px #936316;
+  text-stroke: 4px #936316;
+}

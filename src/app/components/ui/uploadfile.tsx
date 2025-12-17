@@ -28,7 +28,6 @@ type UploadFileProps = {
 // https://react-dropzone.js.org/#section-accepting-specific-file-types
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function UploadFile({
   supportFiles = [],
   accept = {},

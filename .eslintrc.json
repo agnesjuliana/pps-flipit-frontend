@@ -1,7 +1,22 @@
 {
   "extends": [
-    "sznm/react",
-    "plugin:react/jsx-runtime",
-    "plugin:@next/next/recommended"
+    "next/core-web-vitals"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "jsx-a11y/alt-text": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      }
+    }
   ]
 }

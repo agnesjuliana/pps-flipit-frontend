@@ -160,7 +160,9 @@ const Page = () => {
                 Tingkat Pendidikan
               </option>
               {folderListData?.map((item) => (
-                <option value={item.id}>{item.title}</option>
+                <option key={item.id} value={item.id}>
+                  {item.title}
+                </option>
               ))}
             </SelectCreateField>
             <FormFileInput
@@ -209,8 +211,11 @@ const Page = () => {
         <h3 className="text-lg font-bold">Flash cards</h3>
         <div className="mt-3 flex flex-col gap-3">
           {generateData &&
-            generateData.flashcards.map((item) => (
-              <div className="flex flex-col rounded-lg bg-[#F4F4F5] px-3 py-2 shadow-sm">
+            generateData.flashcards.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-col rounded-lg bg-[#F4F4F5] px-3 py-2 shadow-sm"
+              >
                 <p className="text-sm font-bold">{item.question}</p>
                 <Divider className="my-3" />
                 <p className="text-xs">{item.answer}</p>

@@ -2,6 +2,7 @@
   "name": "nextarter-tailwind",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.22.0",
   "author": "sozonome",
   "scripts": {
     "dev": "next dev",

@@ -76,7 +76,7 @@ export default function StreakTrackerPage() {
   const currentStreak = weeklyStreakData?.streakTotal || 0;
   const totalFlashcards = monthlyStreakData?.flashcardTotal || 0;
   const todayPlays = monthlyStreakData?.todayPlayTotal || 0;
-  
+
   // Calculate streak percentage (assuming 30 days max for a "perfect" month)
   const streakPercentage = Math.min((currentStreak / 30) * 100, 100);
 
@@ -88,7 +88,7 @@ export default function StreakTrackerPage() {
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white"></div>
           <div className="absolute -left-10 bottom-0 h-48 w-48 rounded-full bg-white"></div>
         </div>
-        
+
         <div className="relative mx-auto max-w-4xl px-6 py-12 md:px-8">
           <Link
             href="/app/activity"
@@ -96,7 +96,7 @@ export default function StreakTrackerPage() {
           >
             ← Kembali ke Activity
           </Link>
-          
+
           <div className="flex items-center justify-between">
             <div>
               <h1 className="mb-2 text-4xl font-extrabold md:text-5xl">

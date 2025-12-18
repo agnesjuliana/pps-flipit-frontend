@@ -1,6 +1,5 @@
 'use server';
 
-import axios from 'axios';
 import { cookies } from 'next/headers';
 
 import {
@@ -9,23 +8,49 @@ import {
   type CreatePlayType,
 } from './model';
 
-const baseUrl = process.env.BASE_URL;
-
 export const createPlay = async (playData: CreatePlayType) => {
   try {
-    const token = cookies().get('token')?.value;
-    const response = await axios.post(`${baseUrl}/play`, playData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    // Simulate a successful response with mock data
+    const mockResponse = {
+      play: {
+        id: 1,
+        playId: 123,
+        flashcardId: playData.flashcardId,
+        datePlay: new Date().toISOString(),
+        streakId: 10,
+        wrong: 2,
+        right: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
-    });
+      flashcardItems: [
+        {
+          id: 1,
+          flashcardId: playData.flashcardId,
+          question: 'What is phishing?',
+          answer: 'A type of cyber attack.',
+          imageQuestion: 'https://example.com/question1.png',
+          imageAnswer: 'https://example.com/answer1.png',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          flashcardId: playData.flashcardId,
+          question: 'How to recognize phishing emails?',
+          answer: 'Check for suspicious links and sender details.',
+          imageQuestion: 'https://example.com/question2.png',
+          imageAnswer: 'https://example.com/answer2.png',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+    };
 
-    return CreatePlayResponseSchema.parse(response.data.data);
+    return CreatePlayResponseSchema.parse(mockResponse);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    throw new Error(
-      e.response?.data?.message || 'An error occurred while creating the play'
-    );
+    throw new Error(e.message || 'An error occurred while creating the play');
   }
 };
 
@@ -33,43 +58,39 @@ export const createPlayResult = async (
   playResultData: CreatePlayResultType
 ) => {
   try {
-    const token = cookies().get('token')?.value;
-    const response = await axios.post(
-      `${baseUrl}/play/${playResultData.playId}/result`,
-      playResultData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
+    // Simulate a successful response with mock data
+    const mockResponse = {
+      playId: playResultData.playId,
+      flashcardItemId: playResultData.flashcardItemId,
+      isTrue: playResultData.isTrue,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    console.log('Mock create play result response:', mockResponse);
+    return { data: mockResponse };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
+    console.error('Create play result error:', e);
     throw new Error(
-      e.response?.data?.message ||
-        'An error occurred while creating the play result'
+      e.message || 'An error occurred while creating the play result'
     );
   }
 };
 
 export const finishPlay = async (playId: number) => {
   try {
-    const token = cookies().get('token')?.value;
-    const response = await axios.post(
-      `${baseUrl}/play/${playId}/finish`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Simulate a successful response with mock data
+    const mockResponse = {
+      playId,
+      status: 'completed',
+      finishedAt: new Date().toISOString(),
+    };
+
+    console.log('Mock finish play response:', mockResponse);
+    return { data: mockResponse };
   } catch (e: any) {
-    throw new Error(
-      e.response?.data?.message || 'An error occurred while finishing the play'
-    );
+    console.error('Finish play error:', e);
+    throw new Error(e.message || 'An error occurred while finishing the play');
   }
 };

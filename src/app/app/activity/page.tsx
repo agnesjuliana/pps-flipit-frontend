@@ -5,40 +5,24 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RiShareBoxFill } from 'react-icons/ri';
 
-import { useMonthlyStreak } from '@/app/api/Streak/services';
 import { Calendar } from '@/app/components/ui/calendar';
+import { useMonthlyStreak } from '@/app/api/Streak/services';
 
 export default function ActivityPage() {
-  const [selectedDates, setSelectedDates] = useState<Date[]>();
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const {
-    data: monthlyStreakData,
-    isLoading: isMonthlyStreakLoading,
-    isError: isMonthlyStreakError,
-    error: monthlyStreakError,
+    data: monthlyStreakData = {
+      streakTotal: 0,
+      todayPlayTotal: 0,
+      flashcardTotal: 0,
+      streakMonth: [],
+    },
   } = useMonthlyStreak();
 
-  useEffect(() => {
-    if (!isMonthlyStreakLoading && monthlyStreakData) {
-      const newSelectedDates: Date[] = monthlyStreakData.streakMonth
-        .filter((day) => day.isStreak)
-        .map(
-          (day) =>
-            new Date(
-              `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day.day}`
-            )
-        );
-      setSelectedDates(newSelectedDates);
-    }
-  }, [isMonthlyStreakLoading, monthlyStreakData]);
-
-  if (isMonthlyStreakLoading) return <div>Loading...</div>;
-  if (isMonthlyStreakError)
-    return <div>Error: {monthlyStreakError.message}</div>;
-
   return (
-    <section className="relative flex flex-col md:mx-auto md:max-w-4xl">
-      <Image src="/assets/app/head.png" width={646} height={146} className="w-full" />
-      <div className="flex flex-col p-5 md:p-8">
+    <section className="relative flex flex-col">
+      <Image src="/assets/app/head.png" width={646} height={146} />
+      <div className="flex flex-col p-5">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Aktivitas</h1>
           <Link href="/">

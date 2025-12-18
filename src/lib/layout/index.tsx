@@ -19,7 +19,7 @@ const Layout = ({ children }: LayoutProps) => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <main className="content light min-h-screen">{children}</main>
+            <main className="content min-h-screen light">{children}</main>
           </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>

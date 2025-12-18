@@ -10,7 +10,7 @@ const login = async (credentials: LoginUserType) => {
   try {
     console.log('[LOGIN] Attempting login to:', `${baseUrl}/auth/login`);
     console.log('[LOGIN] Credentials:', { email: credentials.email });
-    
+
     return await axios
       .post(`${baseUrl}/auth/login`, credentials)
       .then(async (res) => {

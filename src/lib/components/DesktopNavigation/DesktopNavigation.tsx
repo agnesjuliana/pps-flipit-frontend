@@ -40,7 +40,7 @@ const DesktopNavigation = () => {
     return (
       <nav className="hidden w-full border-b bg-white shadow-sm md:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
-          <div className="text-2xl font-bold text-brand-base">Flip It</div>
+          <div className="text-2xl font-bold text-brand-base">Scam Aware</div>
           <div className="flex items-center gap-1">
             {items.map((item, i) => (
               <Link
@@ -49,7 +49,7 @@ const DesktopNavigation = () => {
                 className={cn(
                   'flex items-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:bg-brand-base-light hover:text-brand-base',
                   checkActive(item.route) &&
-                    'bg-brand-base-light text-brand-base font-semibold'
+                    'bg-brand-base-light font-semibold text-brand-base'
                 )}
               >
                 {item.icon}

@@ -17,7 +17,11 @@ export default function QuizInteractivePage() {
   const flashcardId = Number(params.flashcardId);
   const playId = Number(params.playId);
 
-  const { data: flashcardItems, isLoading, isError } = useFlashcardQuestion(flashcardId);
+  const {
+    data: flashcardItems,
+    isLoading,
+    isError,
+  } = useFlashcardQuestion(flashcardId);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -51,7 +55,9 @@ export default function QuizInteractivePage() {
         <Card className="max-w-md p-8 text-center">
           <X className="mx-auto mb-4 h-16 w-16 text-red-500" />
           <h2 className="mb-2 text-2xl font-bold">Quiz Tidak Tersedia</h2>
-          <p className="mb-4 text-gray-600">Tidak ada soal dalam flashcard ini.</p>
+          <p className="mb-4 text-gray-600">
+            Tidak ada soal dalam flashcard ini.
+          </p>
           <Link
             href="/app/home"
             className="inline-block rounded-lg bg-brand-base px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-700"
@@ -166,7 +172,9 @@ export default function QuizInteractivePage() {
                 Kembali
               </Link>
               <button
-                onClick={() => router.push(`/app/flashcard/${flashcardId}/${playId}/result`)}
+                onClick={() =>
+                  router.push(`/app/flashcard/${flashcardId}/${playId}/result`)
+                }
                 className="rounded-lg bg-brand-base px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-700"
               >
                 Lihat Detail
@@ -251,7 +259,7 @@ export default function QuizInteractivePage() {
 
             {/* Back - Answer */}
             <div
-              className="absolute inset-0 rotate-y-180"
+              className="rotate-y-180 absolute inset-0"
               style={{
                 backfaceVisibility: 'hidden',
               }}
@@ -263,7 +271,7 @@ export default function QuizInteractivePage() {
                 <h3 className="mb-4 text-center text-2xl font-bold text-gray-800">
                   {currentItem.answer}
                 </h3>
-                
+
                 <p className="mb-8 text-center text-lg text-gray-600">
                   Apakah jawaban kamu benar?
                 </p>

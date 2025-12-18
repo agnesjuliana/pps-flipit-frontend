@@ -94,7 +94,9 @@ const mockLeaderboardData = [
 
 export default function LeaderboardPage() {
   const user = useUserData();
-  const [timePeriod, setTimePeriod] = useState<'week' | 'month' | 'alltime'>('week');
+  const [timePeriod, setTimePeriod] = useState<'week' | 'month' | 'alltime'>(
+    'week'
+  );
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -157,7 +159,7 @@ export default function LeaderboardPage() {
                 Leaderboard
               </h1>
               <p className="text-purple-100">
-                Lihat ranking pengguna terbaik di Flip It! 🏆
+                Lihat ranking pengguna terbaik di Scam Aware! 🏆
               </p>
             </div>
           </div>
@@ -213,7 +215,9 @@ export default function LeaderboardPage() {
                 {currentUserData.avatar}
               </div>
               <div>
-                <p className="font-bold text-gray-800">{currentUserData.name}</p>
+                <p className="font-bold text-gray-800">
+                  {currentUserData.name}
+                </p>
                 <p className="text-sm text-gray-500">
                   Peringkat #{currentUserData.rank}
                 </p>
@@ -232,7 +236,7 @@ export default function LeaderboardPage() {
         <div className="mb-8 grid grid-cols-3 items-end gap-4">
           {/* 2nd Place */}
           <div className="text-center">
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-300 to-gray-500 text-3xl shadow-lg mx-auto">
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-300 to-gray-500 text-3xl shadow-lg">
               {mockLeaderboardData[1].avatar}
             </div>
             <div className="rounded-t-xl bg-gradient-to-br from-gray-200 to-gray-400 px-3 py-6 shadow-lg">
@@ -249,7 +253,7 @@ export default function LeaderboardPage() {
 
           {/* 1st Place */}
           <div className="text-center">
-            <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-4xl shadow-xl mx-auto ring-4 ring-yellow-200">
+            <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-4xl shadow-xl ring-4 ring-yellow-200">
               {mockLeaderboardData[0].avatar}
             </div>
             <div className="rounded-t-xl bg-gradient-to-br from-yellow-400 to-yellow-600 px-3 py-8 shadow-xl">
@@ -266,7 +270,7 @@ export default function LeaderboardPage() {
 
           {/* 3rd Place */}
           <div className="text-center">
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-3xl shadow-lg mx-auto">
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-3xl shadow-lg">
               {mockLeaderboardData[2].avatar}
             </div>
             <div className="rounded-t-xl bg-gradient-to-br from-amber-600 to-amber-800 px-3 py-6 shadow-lg">
@@ -287,10 +291,15 @@ export default function LeaderboardPage() {
           {mockLeaderboardData.slice(3).map((player, index) => (
             <Card
               key={player.id}
-              className="transform overflow-hidden p-0 transition-all hover:scale-102 hover:shadow-xl"
+              className="hover:scale-102 transform overflow-hidden p-0 transition-all hover:shadow-xl"
             >
               <div className="flex items-center gap-4 p-4">
-                <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg', getRankBgColor(player.rank))}>
+                <div
+                  className={cn(
+                    'flex h-12 w-12 items-center justify-center rounded-lg',
+                    getRankBgColor(player.rank)
+                  )}
+                >
                   <span className="text-xl font-extrabold text-white">
                     {player.rank}
                   </span>
@@ -346,8 +355,8 @@ export default function LeaderboardPage() {
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
               <span>
-                <strong>Jaga Streak:</strong> Bonus poin untuk belajar
-                konsisten setiap hari
+                <strong>Jaga Streak:</strong> Bonus poin untuk belajar konsisten
+                setiap hari
               </span>
             </li>
             <li className="flex items-start gap-2">

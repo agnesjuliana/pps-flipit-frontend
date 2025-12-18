@@ -39,16 +39,10 @@
 
 .content {
   max-width: 100%;
+  max-width: 100%;
   margin: auto;
   background: white;
   min-height: 100dvh;
-}
-
-@media (min-width: 768px) {
-  .content {
-    max-width: 1280px;
-    padding: 0 2rem;
-  }
 }
 
 * {

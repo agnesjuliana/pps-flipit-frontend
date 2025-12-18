@@ -60,11 +60,11 @@ const Page = () => {
     const isLastCard = position === flashcardQuestionListData.length - 1;
 
     mutate(payload, {
-      onSuccess: (data: CreatePlayResponseType) => {
+      onSuccess: () => {
         if (isLastCard) {
           // If last card, finish and redirect
           mutateFinish(Number(playId), {
-            onSuccess: (data: CreatePlayResponseType) => {
+            onSuccess: () => {
               router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
             },
           });
@@ -89,11 +89,11 @@ const Page = () => {
     const isLastCard = position === flashcardQuestionListData.length - 1;
 
     mutate(payload, {
-      onSuccess: (data: CreatePlayResponseType) => {
+      onSuccess: () => {
         if (isLastCard) {
           // If last card, finish and redirect
           mutateFinish(Number(playId), {
-            onSuccess: (data: CreatePlayResponseType) => {
+            onSuccess: () => {
               // Invalidate streak queries to refresh data
               queryClient.invalidateQueries({ queryKey: ['weeklyStreak'] });
               queryClient.invalidateQueries({ queryKey: ['monthlyStreak'] });

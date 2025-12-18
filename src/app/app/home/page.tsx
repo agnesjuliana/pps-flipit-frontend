@@ -7,7 +7,7 @@
 
 import { Book, Copy, Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 import type {
   CreatePlayResponseType,
@@ -210,6 +210,52 @@ const Page = () => {
             </div>
           </div>
         </Card>
+
+        {/* Quick Access Menu */}
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <Link href="/app/streak-tracker">
+            <Card className="transform cursor-pointer border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50 transition-all hover:scale-105 hover:shadow-lg">
+              <div className="flex flex-col items-center gap-2 py-4">
+                <div className="rounded-full bg-orange-100 p-3">
+                  <svg
+                    className="h-8 w-8 text-orange-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <p className="text-center text-sm font-bold text-gray-800">
+                  Streak Tracker
+                </p>
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/app/leaderboard">
+            <Card className="transform cursor-pointer border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 transition-all hover:scale-105 hover:shadow-lg">
+              <div className="flex flex-col items-center gap-2 py-4">
+                <div className="rounded-full bg-purple-100 p-3">
+                  <svg
+                    className="h-8 w-8 text-purple-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path
+                      fillRule="evenodd"
+                      d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <p className="text-center text-sm font-bold text-gray-800">
+                  Leaderboard
+                </p>
+              </div>
+            </Card>
+          </Link>
+        </div>
 
         <div>
           <SectionTitle

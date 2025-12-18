@@ -2,6 +2,7 @@ import { BarChartBig, BookOpen, Home, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 
 import { BottomNavigation } from '@/lib/components/BottomNavigation';
+import { DesktopNavigation } from '@/lib/components/DesktopNavigation';
 
 const items = [
   {

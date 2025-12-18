@@ -159,7 +159,7 @@ export default function LeaderboardPage() {
                 Leaderboard
               </h1>
               <p className="text-purple-100">
-                Lihat ranking pengguna terbaik di Flip It! 🏆
+                Lihat ranking pengguna terbaik di Scam Aware! 🏆
               </p>
             </div>
           </div>

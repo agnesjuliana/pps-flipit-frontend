@@ -40,7 +40,7 @@ const DesktopNavigation = () => {
     return (
       <nav className="hidden w-full border-b bg-white shadow-sm md:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
-          <div className="text-2xl font-bold text-brand-base">Flip It</div>
+          <div className="text-2xl font-bold text-brand-base">Scam Aware</div>
           <div className="flex items-center gap-1">
             {items.map((item, i) => (
               <Link

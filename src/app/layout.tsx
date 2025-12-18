@@ -6,7 +6,7 @@ import { cn } from '@/lib/styles/utils';
 
 import '@/lib/styles/globals.css';
 
-const APP_NAME = 'Flip It';
+const APP_NAME = 'Scam Aware';
 
 const interFont = Inter({
   subsets: ['latin'],
@@ -16,7 +16,7 @@ const interFont = Inter({
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: 'Flip It',
+  description: 'Scam Aware',
   applicationName: APP_NAME,
   appleWebApp: {
     capable: true,

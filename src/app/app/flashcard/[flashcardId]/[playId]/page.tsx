@@ -31,7 +31,7 @@ const Page = () => {
 
   const [isFliped, setIsFliped] = useState(false);
   const [position, setPosition] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState<number>(0); // Properly initialize progress state
 
   // Use mock data
   const flashcardData = getFlashcardById(Number(flashcardId));
@@ -56,20 +56,19 @@ const Page = () => {
       isTrue: false,
     };
 
-    // Check if this is the last flashcard BEFORE incrementing position
     const isLastCard = position === flashcardQuestionListData.length - 1;
 
     mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        const data = response.data;
         if (isLastCard) {
-          // If last card, finish and redirect
           mutateFinish(Number(playId), {
-            onSuccess: () => {
+            onSuccess: (response) => {
+              const finishData = response.data;
               router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
             },
           });
         } else {
-          // If not last card, increment position
           setPosition((prev) => prev + 1);
           setIsFliped(!isFliped);
           calculateWidth();
@@ -85,23 +84,21 @@ const Page = () => {
       isTrue: true,
     };
 
-    // Check if this is the last flashcard BEFORE incrementing position
     const isLastCard = position === flashcardQuestionListData.length - 1;
 
     mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        const data = response.data;
         if (isLastCard) {
-          // If last card, finish and redirect
           mutateFinish(Number(playId), {
-            onSuccess: () => {
-              // Invalidate streak queries to refresh data
+            onSuccess: (response) => {
+              const finishData = response.data;
               queryClient.invalidateQueries({ queryKey: ['weeklyStreak'] });
               queryClient.invalidateQueries({ queryKey: ['monthlyStreak'] });
               router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
             },
           });
         } else {
-          // If not last card, increment position
           setPosition((prev) => prev + 1);
           setIsFliped(!isFliped);
           calculateWidth();

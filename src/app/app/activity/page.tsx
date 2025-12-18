@@ -5,40 +5,35 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RiShareBoxFill } from 'react-icons/ri';
 
-import { useMonthlyStreak } from '@/app/api/Streak/services';
 import { Calendar } from '@/app/components/ui/calendar';
+import { useMonthlyStreak } from '@/app/api/Streak/services';
 
 export default function ActivityPage() {
-  const [selectedDates, setSelectedDates] = useState<Date[]>();
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const {
-    data: monthlyStreakData,
-    isLoading: isMonthlyStreakLoading,
-    isError: isMonthlyStreakError,
-    error: monthlyStreakError,
+    data: monthlyStreakData = {
+      streakTotal: 0,
+      todayPlayTotal: 0,
+      flashcardTotal: 0,
+      streakMonth: [],
+    },
   } = useMonthlyStreak();
 
-  useEffect(() => {
-    if (!isMonthlyStreakLoading && monthlyStreakData) {
-      const newSelectedDates: Date[] = monthlyStreakData.streakMonth
-        .filter((day) => day.isStreak)
-        .map(
-          (day) =>
-            new Date(
-              `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day.day}`
-            )
-        );
-      setSelectedDates(newSelectedDates);
-    }
-  }, [isMonthlyStreakLoading, monthlyStreakData]);
-
-  if (isMonthlyStreakLoading) return <div>Loading...</div>;
-  if (isMonthlyStreakError)
-    return <div>Error: {monthlyStreakError.message}</div>;
-
   return (
-    <section className="relative flex flex-col">
-      <Image src="/assets/app/head.png" width={646} height={146} />
-      <div className="flex flex-col p-5">
+    <section className="relative flex flex-col md:min-h-screen md:items-center md:justify-center">
+      {/* Header Image - Mobile Only */}
+      <Image
+        src="/assets/app/head.png"
+        width={646}
+        height={146}
+        className="md:hidden"
+      />
+
+      {/* Quarter Circles - Desktop Only */}
+      <div className="absolute left-0 top-0 hidden aspect-square w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-br-full bg-[#FEC536] md:block" />
+      <div className="absolute right-0 top-0 hidden aspect-square w-[500px] -translate-y-1/2 translate-x-1/2 rounded-bl-full bg-[#FEC536] md:block" />
+
+      <div className="flex w-full flex-col p-5 md:max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Aktivitas</h1>
           <Link href="/">

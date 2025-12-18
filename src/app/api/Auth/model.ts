@@ -15,11 +15,6 @@ export const CreateUserSchema = z
     name: z
       .string({ required_error: 'Nama harus diisi' })
       .nonempty({ message: 'Nama harus diisi' }),
-    dateOfBirth: z
-      .string({ required_error: 'Tanggal lahir harus diisi' })
-      .refine((date) => !Number.isNaN(Date.parse(date)), {
-        message: 'Masukkan tanggal lahir yang valid',
-      }),
     educationLevel: z.enum(
       [
         'Elementary_School',

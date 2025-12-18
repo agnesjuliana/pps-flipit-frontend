@@ -38,10 +38,10 @@
 }
 
 .content {
-  max-width: 430px;
+  max-width: 100%;
   margin: auto;
   background: white;
-  height: 100dvh;
+  min-height: 100dvh;
 }
 
 * {

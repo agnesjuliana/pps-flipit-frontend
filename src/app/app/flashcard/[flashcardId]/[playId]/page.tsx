@@ -7,121 +7,118 @@
 
 'use client';
 
-import { Button } from '@nextui-org/react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IoIosArrowBack, IoIosArrowForward, IoMdClose } from 'react-icons/io';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useFlashcardQuestion } from '@/app/api/Flashcard/services';
 import type {
   CreatePlayResponseType,
   CreatePlayResultType,
 } from '@/app/api/Play/model';
 import { useCreatePlayResult, useFinishPlay } from '@/app/api/Play/service';
+import { getFlashcardById } from '@/lib/data/mockData';
 import { cn } from '@/lib/styles/utils';
 
 import classes from './page.module.css';
 
 const Page = () => {
-  const router = useParams();
-  const flashcardId = router.flashcardId.toString();
-  const playId = router.playId.toString();
-  const route = useRouter();
+  const params = useParams();
+  const flashcardId = params.flashcardId.toString();
+  const playId = params.playId.toString();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [isFliped, setIsFliped] = useState(false);
   const [position, setPosition] = useState(0);
   const [progress, setProgress] = useState(0);
-  const {
-    data: flashcardQuestionListData,
-    isLoading: isFlashcardQuestionLoading,
-    isError: isFlashcardQuestionError,
-    error: flashcardQuestionError,
-  } = useFlashcardQuestion(Number(flashcardId));
+
+  // Use mock data
+  const flashcardData = getFlashcardById(Number(flashcardId));
+  const flashcardQuestionListData = flashcardData?.items || [];
 
   const calculateWidth = () => {
-    const total = flashcardQuestionListData?.length ?? 0;
-    setProgress(((position + 1) / (total ?? 0)) * 100);
+    const total = flashcardQuestionListData.length;
+    setProgress(((position + 1) / total) * 100);
   };
 
   useEffect(() => {
     calculateWidth();
-  }, [position, flashcardQuestionListData]);
+  }, [position]);
 
-  const {
-    mutate,
-    isError,
-    error: errMessage,
-    isPending,
-  } = useCreatePlayResult();
-
-  const {
-    mutate: mutateFinish,
-    isError: isFinishError,
-    error: finishErrMessage,
-    isPending: finishIsPending,
-  } = useFinishPlay();
+  const { mutate } = useCreatePlayResult();
+  const { mutate: mutateFinish } = useFinishPlay();
 
   const handleFalse = () => {
     const payload: CreatePlayResultType = {
-      flashcardItemId: flashcardQuestionListData?.[position]?.id ?? 0,
+      flashcardItemId: flashcardQuestionListData[position]?.id ?? 0,
       playId: Number(playId),
       isTrue: false,
     };
 
+    // Check if this is the last flashcard BEFORE incrementing position
+    const isLastCard = position === flashcardQuestionListData.length - 1;
+
     mutate(payload, {
       onSuccess: (data: CreatePlayResponseType) => {
-        setPosition((prev) => prev + 1);
-        setIsFliped(!isFliped);
-        calculateWidth();
+        if (isLastCard) {
+          // If last card, finish and redirect
+          mutateFinish(Number(playId), {
+            onSuccess: (data: CreatePlayResponseType) => {
+              router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
+            },
+          });
+        } else {
+          // If not last card, increment position
+          setPosition((prev) => prev + 1);
+          setIsFliped(!isFliped);
+          calculateWidth();
+        }
       },
     });
-
-    if (position === (flashcardQuestionListData?.length ?? 0) - 1) {
-      mutateFinish(Number(playId), {
-        onSuccess: (data: CreatePlayResponseType) => {
-          route.push(`/app/flashcard/${flashcardId}/${playId}/result`);
-        },
-      });
-    }
   };
 
   const handleTrue = () => {
     const payload: CreatePlayResultType = {
-      flashcardItemId: flashcardQuestionListData?.[position]?.id ?? 0,
+      flashcardItemId: flashcardQuestionListData[position]?.id ?? 0,
       playId: Number(playId),
       isTrue: true,
     };
 
+    // Check if this is the last flashcard BEFORE incrementing position
+    const isLastCard = position === flashcardQuestionListData.length - 1;
+
     mutate(payload, {
       onSuccess: (data: CreatePlayResponseType) => {
-        setPosition((prev) => prev + 1);
-        setIsFliped(!isFliped);
-        calculateWidth();
+        if (isLastCard) {
+          // If last card, finish and redirect
+          mutateFinish(Number(playId), {
+            onSuccess: (data: CreatePlayResponseType) => {
+              // Invalidate streak queries to refresh data
+              queryClient.invalidateQueries({ queryKey: ['weeklyStreak'] });
+              queryClient.invalidateQueries({ queryKey: ['monthlyStreak'] });
+              router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
+            },
+          });
+        } else {
+          // If not last card, increment position
+          setPosition((prev) => prev + 1);
+          setIsFliped(!isFliped);
+          calculateWidth();
+        }
       },
     });
-
-    if (position === (flashcardQuestionListData?.length ?? 0) - 1) {
-      mutateFinish(Number(playId), {
-        onSuccess: (data: CreatePlayResponseType) => {
-          route.push(`/app/flashcard/${flashcardId}/${playId}/result`);
-        },
-      });
-    }
   };
 
   const handleNext = () => {
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    if (position === (flashcardQuestionListData?.length ?? 0) - 1) {
-      mutateFinish(Number(playId), {
-        onSuccess: (data: CreatePlayResponseType) => {
-          route.push(`/app/flashcard/${flashcardId}/${playId}/result`);
-        },
-      });
-    } else {
-      setPosition((prev) => prev + 1);
-      setIsFliped(false);
-      calculateWidth();
+    // Prevent going beyond the last card
+    if (position >= flashcardQuestionListData.length - 1) {
+      return;
     }
+
+    setPosition((prev) => prev + 1);
+    setIsFliped(false);
+    calculateWidth();
   };
 
   const handlePrev = () => {
@@ -132,101 +129,115 @@ const Page = () => {
   };
 
   return (
-    <div>
-      <div className="flex w-full flex-col gap-8 px-5 pt-5">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 pb-24 pt-4 sm:gap-6 sm:px-6 sm:pt-6">
         {/* Progress Bar */}
-        <div className="flex w-full items-center gap-2">
-          {/* <Link href="/"> */}
-          <IoMdClose className="text-2xl" />
-          {/* </Link> */}
-          <div className="relative h-3 w-full rounded-[20px] bg-[#D9D9D9]">
+        <div className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm sm:p-4">
+          <button
+            onClick={() => router.push('/app/home')}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors hover:bg-gray-200 sm:h-10 sm:w-10"
+            aria-label="Close"
+          >
+            <IoMdClose className="text-lg text-gray-700 sm:text-xl" />
+          </button>
+          <div className="relative h-2.5 w-full rounded-full bg-gray-200 sm:h-3">
             <div
-              className={cn('absolute h-full rounded-[20px] bg-[#6699CC]')}
+              className={cn(
+                'absolute h-full rounded-full bg-gradient-to-r from-brand-base to-blue-600 transition-all duration-300'
+              )}
               style={{ width: `${progress}%` }}
             />
           </div>
+          <p className="min-w-[3rem] flex-shrink-0 text-right text-xs font-semibold text-gray-700 sm:text-sm">
+            {position + 1}/{flashcardQuestionListData.length}
+          </p>
         </div>
         {/* End Of Progress Bar */}
 
         {/* Button Next and Prev */}
-        <div className="flex justify-between">
-          <Button
-            color="danger"
-            size="sm"
-            variant="solid"
-            startContent={<IoIosArrowBack />}
-            className="flex gap-2 rounded-lg bg-[#FF1F1F] p-2 text-white"
-            onClick={() => {
-              handlePrev();
-            }}
-          />
-          <Button
-            color="danger"
-            size="sm"
-            variant="solid"
-            endContent={<IoIosArrowForward />}
-            className="flex gap-2 rounded-lg bg-[#72C287] p-2 text-white"
-            onClick={() => {
-              handleNext();
-            }}
-          />
+        <div className="flex justify-between gap-3">
+          <button
+            onClick={() => handlePrev()}
+            disabled={position === 0}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500 text-white shadow-md transition-all hover:bg-red-600 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 sm:h-12 sm:w-12"
+            aria-label="Previous"
+          >
+            <IoIosArrowBack className="text-lg sm:text-xl" />
+          </button>
+          <button
+            onClick={() => handleNext()}
+            disabled={position >= flashcardQuestionListData.length - 1}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-500 text-white shadow-md transition-all hover:bg-green-600 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 sm:h-12 sm:w-12"
+            aria-label="Next"
+          >
+            <IoIosArrowForward className="text-lg sm:text-xl" />
+          </button>
         </div>
+
         {!isFliped ? (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
-            className={cn(classes.card, classes.cardUnFlip)}
+            className={cn(
+              classes.card,
+              classes.cardUnFlip,
+              'min-h-[280px] cursor-pointer transition-transform hover:scale-[1.02] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px]'
+            )}
             onClick={() => {
               setIsFliped(!isFliped);
             }}
           >
-            <p className="text-xl font-medium leading-7">
-              {flashcardQuestionListData?.[position]?.question ?? ''}
-            </p>
+            <div className="max-w-2xl">
+              <p className="mb-3 text-sm font-medium text-brand-base sm:mb-4">
+                Pertanyaan
+              </p>
+              <p className="text-lg font-semibold leading-relaxed text-gray-800 sm:text-xl md:text-2xl">
+                {flashcardQuestionListData[position]?.question ?? ''}
+              </p>
+              <p className="mt-4 text-xs text-gray-500 sm:mt-6 sm:text-sm">
+                Klik untuk melihat jawaban
+              </p>
+            </div>
           </div>
         ) : (
           <>
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div
-              className={cn(classes.card, classes.cardFliped)}
+              className={cn(
+                classes.card,
+                classes.cardFliped,
+                'min-h-[280px] cursor-pointer transition-transform hover:scale-[1.02] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px]'
+              )}
               onClick={() => {
                 setIsFliped(!isFliped);
               }}
             >
-              <ul className="ml-5 flex list-disc flex-col text-start">
-                <p className="text-xl font-medium leading-7">
-                  {flashcardQuestionListData?.[position]?.answer ?? ''}
+              <div className="max-w-2xl">
+                <p className="mb-3 text-sm font-medium text-gray-600 sm:mb-4">
+                  Jawaban
                 </p>
-              </ul>
-            </div>
-            <div className="mt-[30%] flex justify-between">
-              <Button
-                color="danger"
-                size="sm"
-                variant="solid"
-                startContent={<IoIosArrowBack />}
-                className="flex gap-2 rounded-lg bg-[#FF1F1F] p-2 text-white"
-                onClick={() => {
-                  handleFalse();
-                }}
-              />
-              <div className="flex flex-col items-center">
-                <p className="text-sm font-bold text-[#FF1F1F]">
-                  Klik Kiri jika <b>Belum Paham</b> 😥
-                </p>
-                <p className="text-sm font-bold text-[#72C287]">
-                  Klik Kanan jika <b>Sudah Paham</b> 🤩
+                <p className="text-lg font-semibold leading-relaxed text-gray-800 sm:text-xl md:text-2xl">
+                  {flashcardQuestionListData[position]?.answer ?? ''}
                 </p>
               </div>
-              <Button
-                color="danger"
-                size="sm"
-                variant="solid"
-                startContent={<IoIosArrowForward />}
-                className="flex gap-2 rounded-lg bg-[#72C287] p-2 text-white"
-                onClick={() => {
-                  handleTrue();
-                }}
-              />
+            </div>
+            <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+              <div className="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
+                <button
+                  onClick={() => handleFalse()}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 px-6 py-3 font-semibold text-white shadow-md transition-all hover:bg-red-600 hover:shadow-lg active:scale-95 sm:w-auto"
+                >
+                  <IoIosArrowBack className="text-lg" />
+                  <span>Belum Paham 😥</span>
+                </button>
+                <div className="hidden h-12 w-px bg-gray-200 sm:block" />
+                <button
+                  onClick={() => handleTrue()}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-6 py-3 font-semibold text-white shadow-md transition-all hover:bg-green-600 hover:shadow-lg active:scale-95 sm:w-auto"
+                >
+                  <span>Sudah Paham 🤩</span>
+                  <IoIosArrowForward className="text-lg" />
+                </button>
+              </div>
             </div>
           </>
         )}

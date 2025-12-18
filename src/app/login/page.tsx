@@ -49,53 +49,63 @@ const Page = () => {
     }
   };
   return (
-    <div className="absolute bottom-0 w-full rounded-t-[32px] bg-white px-[21px] py-10">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-[6px]">
-          <p className="text-2xl font-bold leading-8">Masuk</p>
-          <p className="text-sm font-light leading-5">
-            Masuk dan nikmati perjalanan belajar yang menyenangkan!
-          </p>
-        </div>
-        <Stack justifyContent="space-between" alignItems="left" spacing="20px">
-          <form
-            className="flex w-[100%] flex-col gap-5"
-            onSubmit={handleSubmit(onSubmit, onError)}
-          >
-            <FormInputText name="email" control={control} label="Email" />
-            <FormInputText
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              control={control}
-              label="Kata Sandi"
-              addonRight={() => (
-                <button
-                  type="button"
-                  className="text-gray-400"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              )}
-            />
-            <button
-              className="rounded-[12px] bg-brand-base px-[18px] py-[10px] font-semibold text-white"
-              type="submit"
-            >
-              {isPending ? 'Tunggu...' : 'Masuk'}
-            </button>
-            {isError && (
-              <p className="text-red-600">{(errMessage as Error).message}</p>
-            )}
-            <p className="text-center text-xs">
-              Belum punya akun?{' '}
-              <Link href="/registration">
-                <b>Daftar</b>
-              </Link>{' '}
-              sekarang!
+    <div className="flex min-h-screen w-full items-center justify-center p-4">
+      <div className="w-full max-w-[480px] rounded-[20px] bg-white px-8 py-10 shadow-xl">
+        <div className="flex flex-col gap-3 sm:gap-4 md:gap-5">
+          <div className="flex flex-col gap-1 sm:gap-2">
+            <p className="text-xl font-bold leading-7 sm:text-2xl sm:leading-8 md:text-3xl md:leading-9">
+              Masuk
             </p>
-          </form>
-        </Stack>
+            <p className="text-xs font-light leading-4 text-gray-600 sm:text-sm sm:leading-5 md:text-base md:leading-6">
+              Masuk dan nikmati perjalanan belajar yang menyenangkan!
+            </p>
+          </div>
+          <Stack
+            justifyContent="space-between"
+            alignItems="left"
+            spacing="20px"
+          >
+            <form
+              className="flex w-full flex-col gap-4 sm:gap-5 md:gap-6"
+              onSubmit={handleSubmit(onSubmit, onError)}
+            >
+              <FormInputText name="email" control={control} label="Email" />
+              <FormInputText
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                control={control}
+                label="Kata Sandi"
+                addonRight={() => (
+                  <button
+                    type="button"
+                    className="p-1 text-gray-400 transition-colors hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                )}
+              />
+              <button
+                className="hover:bg-brand-dark rounded-[10px] bg-brand-base px-4 py-3 text-sm font-semibold text-white transition-colors active:scale-95 sm:rounded-[11px] sm:px-5 sm:py-3.5 sm:text-base md:rounded-[12px] md:px-6 md:py-4 md:text-base"
+                type="submit"
+              >
+                {isPending ? 'Tunggu...' : 'Masuk'}
+              </button>
+              {isError && (
+                <p className="text-center text-xs text-red-600 sm:text-sm">
+                  {(errMessage as Error).message}
+                </p>
+              )}
+              <p className="text-center text-xs text-gray-700 sm:text-sm">
+                Belum punya akun?{' '}
+                <Link href="/registration">
+                  <b className="text-brand-base hover:underline">Daftar</b>
+                </Link>{' '}
+                sekarang!
+              </p>
+            </form>
+          </Stack>
+        </div>
       </div>
     </div>
   );

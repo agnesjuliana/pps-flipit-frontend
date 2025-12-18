@@ -11,6 +11,11 @@ interface WeeklyStreakResponse {
   streakTotal: number;
   flashcardTotal: number;
   streakWeek: WeeklyStreak[];
+  weekData: Array<{
+    day: string;
+    attempts: number;
+    correctAnswers: number;
+  }>;
 }
 
 // Fetching API function using react-query
@@ -25,7 +30,7 @@ const weeklyStreakQueryOptions = {
   queryFn: async ({
     signal,
   }: QueryFunctionContext): Promise<WeeklyStreakResponse> => {
-    const response = await fetch(`${baseUrl}/streak/weekly`, {
+    const response = await fetch(`${baseUrl}/quiz/weekly`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -60,7 +65,7 @@ const monthlyStreakQueryOptions = {
   queryFn: async ({
     signal,
   }: QueryFunctionContext): Promise<MonthlyStreakData> => {
-    const response = await fetch(`${baseUrl}/streak/monthly`, {
+    const response = await fetch(`${baseUrl}/quiz/monthly`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -70,7 +75,15 @@ const monthlyStreakQueryOptions = {
       throw new Error('Network response was not ok');
     }
     const responseData = await response.json();
-    return responseData.data; // Extract the data property
+    const data = responseData.data;
+
+    // Ensure default values for missing properties
+    return {
+      streakTotal: data.streakTotal || 0,
+      todayPlayTotal: data.todayPlayTotal || 0,
+      flashcardTotal: data.flashcardTotal || 0,
+      streakMonth: data.streakMonth || [],
+    };
   },
 };
 

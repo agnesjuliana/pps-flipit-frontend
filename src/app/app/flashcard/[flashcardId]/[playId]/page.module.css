@@ -1,22 +1,45 @@
 .cardUnFlip {
-  background: var(--Common-gray-50, #f9fafb);
+  background: white;
   box-shadow:
-    4px 4px 0px 0px #69c,
-    8px 8px 0px 0px #237ac1;
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    6px 6px 0px 0px #6699cc,
+    12px 12px 0px 0px #237ac1;
 }
 .cardFliped {
-  background: var(--Common-gray-50, #f9fafb);
+  background: white;
   box-shadow:
-    4px 4px 0px 0px #818181,
-    8px 8px 0px 0px #505050;
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    6px 6px 0px 0px #818181,
+    12px 12px 0px 0px #505050;
 }
 .card {
-  height: 400px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-
-  border: 1px solid var(--colors-layout-foreground-300, #d4d4d8);
-  padding: 20px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  border: 2px solid #e5e7eb;
+  padding: 2rem 1.5rem;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 2.5rem 2rem;
+  }
+  .cardUnFlip {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      8px 8px 0px 0px #6699cc,
+      16px 16px 0px 0px #237ac1;
+  }
+  .cardFliped {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      8px 8px 0px 0px #818181,
+      16px 16px 0px 0px #505050;
+  }
 }

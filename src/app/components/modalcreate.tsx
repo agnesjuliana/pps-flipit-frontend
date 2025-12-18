@@ -27,47 +27,55 @@ export default function ModalCreate({ isOpen, setIsOpen }: ModalProps) {
 
   return (
     <div
-      className={cn('absolute bottom-0 z-[9999] w-full', !isOpen && 'hidden')}
+      className={cn(
+        'fixed inset-0 z-[9999] flex items-end justify-center sm:items-center',
+        !isOpen && 'hidden'
+      )}
     >
       <div
         onClick={() => setIsOpen(false)}
-        className="relative -z-10 flex h-screen w-full items-end bg-[#3F3F46] bg-opacity-40 "
+        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
       />
-      <div className="relative z-20 flex w-full flex-col gap-5 rounded-t-[28px] bg-white px-5 py-8">
-        <div className="flex gap-7">
+      <div className="animate-slide-up relative z-20 mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-[28px] bg-white px-5 py-6 shadow-2xl sm:m-4 sm:gap-5 sm:rounded-[28px] sm:px-6 sm:py-8">
+        <h3 className="text-center text-lg font-bold text-gray-800 sm:text-xl">
+          Buat Baru
+        </h3>
+        <div className="flex gap-4 sm:gap-5">
           <div
             className={cn(
-              'flex grow cursor-pointer flex-col items-center gap-5 rounded-[20px]  p-5 ',
+              'flex flex-1 cursor-pointer flex-col items-center gap-3 rounded-[20px] p-4 transition-all hover:scale-105 sm:gap-4 sm:p-5',
               selected === 'create-flashcard'
-                ? 'border-2 border-[#69C] text-[#6699CC]'
-                : 'bg-[#F9FAFB] text-[#A1A1AA]'
+                ? 'border-2 border-[#6699CC] bg-blue-50 text-[#6699CC] shadow-md'
+                : 'bg-[#F9FAFB] text-[#A1A1AA] hover:bg-gray-200'
             )}
             onClick={() => {
               setSelected('create-flashcard');
             }}
           >
-            <Copy className=" text-5xl" />
-            <p>Flash Card</p>
+            <Copy className="h-10 w-10 sm:h-12 sm:w-12" />
+            <p className="text-sm font-medium sm:text-base">Flash Card</p>
           </div>
           <div
             className={cn(
-              'flex grow cursor-pointer flex-col items-center gap-5 rounded-[20px]  p-5 ',
+              'flex flex-1 cursor-pointer flex-col items-center gap-3 rounded-[20px] p-4 transition-all hover:scale-105 sm:gap-4 sm:p-5',
               selected === 'create-folder'
-                ? 'border-2 border-[#69C] text-[#6699CC]'
-                : 'bg-[#F9FAFB] text-[#A1A1AA]'
+                ? 'border-2 border-[#6699CC] bg-blue-50 text-[#6699CC] shadow-md'
+                : 'bg-[#F9FAFB] text-[#A1A1AA] hover:bg-gray-200'
             )}
             onClick={() => {
               setSelected('create-folder');
             }}
           >
-            <Folder className=" text-5xl" />
-            <p>Folder</p>
+            <Folder className="h-10 w-10 sm:h-12 sm:w-12" />
+            <p className="text-sm font-medium sm:text-base">Folder</p>
           </div>
         </div>
         <Button
           fullWidth
-          className={`rounded-lg py-2 text-white ${
-            selected === '' ? 'bg-gray-400' : 'bg-[#6699CC]'
+          className={`rounded-xl py-3 text-sm font-semibold text-white transition-all sm:py-3.5 sm:text-base ${
+            selected === ''
+              ? 'cursor-not-allowed bg-gray-400'
+              : 'bg-[#6699CC] hover:bg-[#5588BB] active:scale-95'
           }`}
           onClick={handleClick}
           disabled={selected === ''}

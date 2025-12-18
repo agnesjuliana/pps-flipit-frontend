@@ -10,6 +10,8 @@ const baseUrl = process.env.BASE_URL;
 const registration = async (
   credentials: Omit<CreateUserType, 'confirm_password'>
 ): Promise<unknown> => {
+  console.log('Registration request payload:', credentials);
+  console.log('BASE_URL:', baseUrl);
   const response = await axios.post(`${baseUrl}/auth/register`, credentials);
   return response.data.data;
 };
@@ -27,8 +29,9 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: (payload: Omit<CreateUserType, 'confirm_password'>) =>
       registration(payload),
-    onError: (error: Error) => {
-      console.error(error);
+    onError: (error: any) => {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response?.data);
     },
   });
 };
@@ -47,7 +50,6 @@ interface UserData {
   nama: string;
   email: string;
   role: string;
-  dateOfBirth: string;
   educationLevel: string;
 }
 
@@ -57,7 +59,6 @@ export const useUserData = (): UserData => {
     nama: 'User',
     email: '',
     role: '',
-    dateOfBirth: '',
     educationLevel: '',
   };
 

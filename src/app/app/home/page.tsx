@@ -5,61 +5,31 @@
 
 'use client';
 
-import { Fab } from '@mui/material';
-import { Plus } from 'lucide-react';
+import { Book, Copy, Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { useUserData } from '@/app/api/Auth/services';
-import { useFlashcardList } from '@/app/api/Flashcard/services';
-import { useFolderList } from '@/app/api/Folder/services';
 import type {
   CreatePlayResponseType,
   CreatePlayType,
 } from '@/app/api/Play/model';
 import { useCreatePlay } from '@/app/api/Play/service';
-import { useWeeklyStreak } from '@/app/api/Streak/services';
-import ModalCreate from '@/app/components/modalcreate';
-import Book from '@/lib/assets/book-blue.svg';
-import Fire from '@/lib/assets/fire.svg';
-import HeaderEllipse from '@/lib/assets/header-ellipse.svg';
-import Mascot from '@/lib/assets/home-asset-1.svg';
-import { Card } from '@/lib/components/Card';
+import { useUserData } from '@/app/api/Auth/services';
+import { getAllFlashcards, getAllFolders } from '@/lib/data/mockData';
 import { cn } from '@/lib/styles/utils';
+import Mascot from '@/lib/assets/home-asset-1.svg';
+import Fire from '@/lib/assets/fire.svg';
+import { Card } from '@/lib/components/Card';
 
 const Page = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const user = useUserData();
-  const route = useRouter();
-  const {
-    data: folderListData,
-    isLoading: isFolderLoading,
-    isError: isFolderError,
-    error: folderError,
-  } = useFolderList();
-  const {
-    data: flashcardListData,
-    isLoading: isFlashcardLoading,
-    isError: isFlashcardError,
-    error: flashcardError,
-  } = useFlashcardList();
-  const {
-    data: weeklyStreakData,
-    isLoading: isWeeklyStreakLoading,
-    isError: isWeeklyStreakError,
-    error: weeklyStreakError,
-  } = useWeeklyStreak();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { mutate, isError, error: errMessage, isPending } = useCreatePlay();
+  const router = useRouter();
+  const userData = useUserData();
 
-  if (isFlashcardLoading) return <div>Loading...</div>;
-  if (isFlashcardError) return <div>Error: {flashcardError.message}</div>;
+  // Use mock data
+  const folderListData = getAllFolders();
+  const flashcardListData = getAllFlashcards();
 
-  if (isFolderLoading) return <div>Loading...</div>;
-  if (isFolderError) return <div>Error: {folderError.message}</div>;
-
-  if (isWeeklyStreakLoading) return <div>Loading...</div>;
-  if (isWeeklyStreakError) return <div>Error: {weeklyStreakError.message}</div>;
+  const { mutate } = useCreatePlay();
 
   const winStreakData = [
     { keyDay: 'Monday', day: 'Sen', isStreak: false },
@@ -71,25 +41,20 @@ const Page = () => {
     { keyDay: 'Sunday', day: 'Min', isStreak: false },
   ];
 
-  weeklyStreakData?.streakWeek.forEach((item) => {
-    const index = winStreakData.findIndex((day) => day.keyDay === item.day);
-    winStreakData[index].isStreak = item.isStreak;
-  });
-
   const handleFlashcardClick = async (flashcardId: number) => {
     const payload: CreatePlayType = {
-      flashcardId: Number(flashcardId), // Replace with the actual flashcardId you want to use
+      flashcardId: Number(flashcardId),
     };
     mutate(payload, {
       onSuccess: (data: CreatePlayResponseType) => {
-        route.push(`/app/flashcard/${flashcardId}/${data.play.id}`);
+        router.push(`/app/flashcard/${flashcardId}/${data.play.id}`);
       },
     });
   };
 
   const handleFolderClick = async (folderId: number, folderTitle: string) => {
     const path = folderTitle.replace(/\s/g, '-');
-    route.push(`/app/folder/${folderId}/${path}`);
+    router.push(`/app/folder/${folderId}/${path}`);
   };
 
   const StreakIndicator = ({
@@ -101,11 +66,16 @@ const Page = () => {
   }) => {
     return (
       <div className="flex flex-col items-center justify-center gap-1">
-        <p className="rounded-md bg-gray-100 px-1 font-semibold">{day}</p>
+        <p className="rounded-md bg-gray-100 px-1 text-xs font-semibold sm:text-sm">
+          {day}
+        </p>
         {isStreak ? (
-          <Fire style={{ width: '26px', height: '26px' }} />
+          <Fire
+            style={{ width: '20px', height: '20px' }}
+            className="sm:h-[26px] sm:w-[26px]"
+          />
         ) : (
-          <div className="h-[26px] w-[26px] rounded-full bg-gray-300" />
+          <div className="h-5 w-5 rounded-full bg-gray-300 sm:h-[26px] sm:w-[26px]" />
         )}
       </div>
     );
@@ -121,13 +91,15 @@ const Page = () => {
     titleColor?: string;
   }) => {
     return (
-      <div className="mt-2 flex items-baseline gap-1">
+      <div className="mt-2 flex flex-wrap items-baseline gap-1">
         <p
-          className={cn(`text-[22px] font-bold ${titleColor ?? 'text-black'}`)}
+          className={cn(
+            `text-lg font-bold sm:text-xl md:text-2xl ${titleColor ?? 'text-black'}`
+          )}
         >
           {title}
         </p>
-        <p>{subtitle}</p>
+        <p className="text-xs sm:text-sm">{subtitle}</p>
       </div>
     );
   };
@@ -143,15 +115,15 @@ const Page = () => {
   }) => {
     return (
       <button
-        className="text-left"
+        className="flex-shrink-0 text-left"
         type="button"
         aria-label="flashcard-button"
         onClick={() => handleFlashcardClick(flashcardId)}
       >
-        <Card className="w-[200px] border-[#E4E4E7]">
+        <Card className="w-40 border-[#E4E4E7] sm:w-48 md:w-56">
           <div className="flex flex-col gap-1">
-            <p className="text-sm font-bold">{title}</p>
-            <p className="text-xs text-gray-500">{subtitle}</p>
+            <p className="line-clamp-2 text-xs font-bold sm:text-sm">{title}</p>
+            <p className="line-clamp-1 text-xs text-gray-500">{subtitle}</p>
           </div>
         </Card>
       </button>
@@ -169,16 +141,16 @@ const Page = () => {
   }) => {
     return (
       <button
-        className="text-left"
+        className="flex-shrink-0 text-left"
         type="button"
         aria-label="folder-button"
         onClick={() => handleFolderClick(folderId, title)}
       >
-        <Card className="w-[170px] border-[#E4E4E7] bg-[#F9FAFB]">
+        <Card className="w-40 border-[#E4E4E7] bg-[#F9FAFB] sm:w-48 md:w-56">
           <div className="flex flex-col gap-1">
-            <p className="text-4xl">📁</p>
-            <p className="text-sm font-bold">{title}</p>
-            <p className="text-xs text-gray-500">{subtitle}</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl">📁</p>
+            <p className="line-clamp-2 text-xs font-bold sm:text-sm">{title}</p>
+            <p className="line-clamp-1 text-xs text-gray-500">{subtitle}</p>
           </div>
         </Card>
       </button>
@@ -187,45 +159,47 @@ const Page = () => {
 
   return (
     <div className="min-h-screen">
-      <header className="items-center justify-between text-white">
-        <div className="relative z-10">
-          <div className="fixed left-1/2 flex h-11 w-full -translate-x-1/2 transform items-center justify-center">
-            <HeaderEllipse
-              style={{
-                width: '430px',
-                height: '430px',
-                position: 'absolute',
-                zIndex: '0',
-              }}
-            />
-          </div>
-          <div className="fixed left-1/2 top-4 flex h-11 w-full max-w-xs -translate-x-1/2 transform items-center justify-center gap-32 rounded-full bg-white p-4">
-            <div className="flex items-center justify-center text-black">
-              <Book style={{ width: '24px', height: '24px' }} />
-              <p className="text-base font-medium">
-                {weeklyStreakData?.flashcardTotal}
-              </p>
-            </div>
-            <div className="flex items-center justify-center text-black">
-              <Fire style={{ width: '24px', height: '24px' }} />
-              <p className="text-base font-medium">
-                {weeklyStreakData?.streakTotal}
-              </p>
+      <header className="sticky top-0 z-40 bg-gradient-to-b from-brand-base to-brand-base pb-2">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center justify-center pb-3 pt-4">
+            <div className="flex items-center gap-6 rounded-full bg-white px-6 py-2.5 shadow-lg sm:gap-8 sm:py-3">
+              <div className="flex items-center gap-2">
+                <Book className="h-5 w-5 text-brand-base sm:h-6 sm:w-6" />
+                <p className="text-sm font-semibold text-gray-800 sm:text-base">
+                  {flashcardListData.length}
+                </p>
+              </div>
+              <div className="h-6 w-px bg-gray-300" />
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-500 sm:h-6 sm:w-6" />
+                <p className="text-sm font-semibold text-gray-800 sm:text-base">
+                  {0}
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </header>
-      <div className="flex flex-col gap-3 p-6 pb-24 pt-24">
-        <p className="text-4xl font-extrabold text-brand-base">
-          Hi, {user.nama} 👋🏻
-        </p>
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-3">
-            <p className="text-sm">
-              Yuk lanjutin <b>Streak Harian</b> kamu!
+
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8">
+        <div>
+          <h1 className="mb-2 text-3xl font-bold text-brand-base sm:text-4xl md:text-5xl">
+            Hi, {userData.nama} 👋🏻
+          </h1>
+          <p className="text-sm text-gray-600 sm:text-base">
+            Selamat datang kembali!
+          </p>
+        </div>
+
+        <Card className="border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="flex flex-col items-center gap-3 p-2 text-center sm:gap-4 sm:p-4">
+            <p className="text-sm font-medium text-gray-700 sm:text-base md:text-lg">
+              Yuk lanjutin{' '}
+              <span className="font-bold text-brand-base">Streak Harian</span>{' '}
+              kamu!
             </p>
-            <Mascot style={{ height: '120px', width: '90px' }} />
-            <div className="flex justify-between gap-3">
+            <Mascot className="h-20 w-auto sm:h-24 md:h-28" />
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
               {winStreakData?.map((item, i) => (
                 <StreakIndicator
                   key={i as number}
@@ -236,94 +210,99 @@ const Page = () => {
             </div>
           </div>
         </Card>
-        <SectionTitle
-          title="Flash Cards"
-          titleColor="text-yellow-500"
-          subtitle="terbaru kamu!"
-        />
-        <div className="bg-base-black container flex gap-6 overflow-auto whitespace-nowrap">
-          {flashcardListData && flashcardListData.length > 0 ? (
-            flashcardListData.map((item) => (
-              <FlashCardRecently
-                key={item?.id}
-                title={item?.title}
-                subtitle={item?.description}
-                flashcardId={item?.id}
-              />
-            ))
-          ) : (
-            <div
-              className="mb-4 flex w-full items-center rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800"
-              role="alert"
-            >
-              <svg
-                className="me-3 inline h-4 w-4 flex-shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-              </svg>
-              <span className="sr-only">Info</span>
-              <div className="w-full">
+
+        <div>
+          <SectionTitle
+            title="Flash Cards"
+            titleColor="text-yellow-600"
+            subtitle="terbaru kamu!"
+          />
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            {flashcardListData && flashcardListData.length > 0 ? (
+              flashcardListData.map((item) => (
+                <button
+                  key={item?.id}
+                  className="group w-full text-left"
+                  type="button"
+                  aria-label="flashcard-button"
+                  onClick={() => handleFlashcardClick(item?.id)}
+                >
+                  <Card className="h-full w-full border-gray-200 transition-all duration-200 hover:border-brand-base hover:shadow-lg group-hover:scale-105">
+                    <div className="flex flex-col gap-2 p-3 sm:p-4">
+                      <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 sm:h-10 sm:w-10">
+                        <Copy className="h-4 w-4 text-yellow-600 sm:h-5 sm:w-5" />
+                      </div>
+                      <p className="line-clamp-2 text-sm font-bold text-gray-800 sm:text-base">
+                        {item?.title}
+                      </p>
+                      <p className="line-clamp-1 text-xs text-gray-500">
+                        {item?.description}
+                      </p>
+                    </div>
+                  </Card>
+                </button>
+              ))
+            ) : (
+              <div className="col-span-full flex items-center gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+                <svg
+                  className="h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                </svg>
                 <span className="font-medium">
                   Kamu belum membuat Flashcard!
                 </span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        <SectionTitle
-          title="Folder"
-          titleColor="text-green-500"
-          subtitle="kamu ada disini!"
-        />
-        <div className="bg-base-black container flex gap-6 overflow-auto whitespace-nowrap">
-          {folderListData && folderListData.length > 0 ? (
-            folderListData.map((item) => (
-              <ClassFolderCard
-                key={item?.id}
-                title={item?.title}
-                subtitle={item?.description} // Use description as subtitle
-                folderId={item?.id}
-              />
-            ))
-          ) : (
-            <div
-              className="mb-4 flex w-full items-center rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800"
-              role="alert"
-            >
-              <svg
-                className="me-3 inline h-4 w-4 flex-shrink-0"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-              </svg>
-              <span className="sr-only">Info</span>
-              <div className="w-full">
+
+        <div>
+          <SectionTitle
+            title="Folder"
+            titleColor="text-green-600"
+            subtitle="kamu ada disini!"
+          />
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            {folderListData && folderListData.length > 0 ? (
+              folderListData.map((item) => (
+                <button
+                  key={item?.id}
+                  className="group w-full text-left"
+                  type="button"
+                  aria-label="folder-button"
+                  onClick={() => handleFolderClick(item?.id, item?.title)}
+                >
+                  <Card className="h-full w-full border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 transition-all duration-200 hover:border-green-400 hover:from-green-50 hover:to-emerald-50 hover:shadow-lg group-hover:scale-105">
+                    <div className="flex flex-col gap-2 p-3 sm:p-4">
+                      <p className="text-3xl sm:text-4xl">📁</p>
+                      <p className="line-clamp-2 text-sm font-bold text-gray-800 sm:text-base">
+                        {item?.title}
+                      </p>
+                      <p className="line-clamp-1 text-xs text-gray-500">
+                        {item?.description}
+                      </p>
+                    </div>
+                  </Card>
+                </button>
+              ))
+            ) : (
+              <div className="col-span-full flex items-center gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+                <svg
+                  className="h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                </svg>
                 <span className="font-medium">Kamu belum membuat Folder!</span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-      <div
-        className="absolute bottom-28 right-4"
-        onClick={() => setIsModalOpen(true)}
-      >
-        <Fab
-          aria-label="add"
-          color="info"
-          className=" bg-brand-base text-white"
-        >
-          <Plus />
-        </Fab>
-      </div>
-      <ModalCreate isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
     </div>
   );
 };

@@ -118,116 +118,178 @@ const Page = () => {
   } = useFolderList();
 
   return !isSubmitted ? (
-    <div className="relative flex h-screen flex-col p-5">
-      <div className="flex items-center gap-3">
-        <button type="button" aria-label="back">
-          <MdArrowBackIos className="text-2xl" />
-        </button>
-        <h1 className=" grow text-lg font-bold">Buat Flash Card</h1>
-        <button type="button" aria-label="more">
-          <MdOutlineMoreVert className="text-2xl" />
-        </button>
-      </div>
-      <div className="flex flex-col gap-6 pb-24 pt-10">
-        <FormProvider {...methods}>
-          <form
-            className="flex flex-col gap-2"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <FormInputCreateText
-              type="text"
-              label="Judul"
-              control={control}
-              name="title"
-              placeholder="Masukkan Judul Materi"
-              className="w-full"
-            />
-            <FormInputCreateText
-              type="text"
-              label="Deskripsi"
-              control={control}
-              name="description"
-              placeholder="Masukkan Deskripsi Materi"
-              className="w-full"
-            />
-            <SelectCreateField
-              label="Folder"
-              placeholder="Pilih Folder"
-              className="w-full light"
-              name="folderId"
-            >
-              <option disabled selected value="">
-                Tingkat Pendidikan
-              </option>
-              {folderListData?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.title}
-                </option>
-              ))}
-            </SelectCreateField>
-            <FormFileInput
-              control={control}
-              name="file"
-              title="Upload your file"
-              description="Select a file to upload"
-              variant="md"
-              supportFiles={['application/pdf']}
-              accept={{ 'application/pdf': ['.pdf'] }}
-              isRequired
-            />
+    <div className="min-h-screen">
+      <div className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="flex h-14 items-center justify-between sm:h-16">
             <button
-              className="mt-[20px] w-full rounded-[12px] bg-brand-base px-[18px] py-[10px] font-semibold text-white"
-              type="submit"
-              disabled={isPending}
+              onClick={() => route.back()}
+              className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-gray-100 sm:h-10 sm:w-10"
+              type="button"
+              aria-label="back"
             >
-              {isPending ? 'Tunggu...' : 'Buat'}
+              <MdArrowBackIos className="text-lg text-gray-700 sm:text-xl" />
             </button>
-          </form>
-        </FormProvider>
-      </div>
-    </div>
-  ) : (
-    <div className="relative flex min-h-screen flex-col p-5">
-      <div className="flex items-center gap-3">
-        <button type="button" aria-label="back">
-          <MdArrowBackIos className="text-2xl" />
-        </button>
-        <h1 className=" grow text-lg font-bold">Buat Flash Card</h1>
-        <button type="button" aria-label="more">
-          <MdOutlineMoreVert className="text-2xl" />
-        </button>
-      </div>
-      <div className="mt-5 flex flex-col rounded-lg bg-[#237AC1] px-3 py-3.5 text-white">
-        <p className="text-sm font-extrabold">{generateData?.title}</p>
-        <p className="text-sm">{generateData?.description}</p>
-        <div className="mt-3 flex items-center gap-2">
-          <IoDocumentTextOutline className=" text-4xl" />
-          <div className="flex flex-col">
-            <p className="text-xs font-bold">{generateData?.path}</p>
+            <h1 className="text-lg font-bold text-gray-800 sm:text-xl">
+              Buat Flash Card
+            </h1>
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-gray-100 sm:h-10 sm:w-10"
+              type="button"
+              aria-label="more"
+            >
+              <MdOutlineMoreVert className="text-lg text-gray-700 sm:text-xl" />
+            </button>
           </div>
         </div>
       </div>
-      <div className="relative mt-4 flex h-full flex-col">
-        <h3 className="text-lg font-bold">Flash cards</h3>
-        <div className="mt-3 flex flex-col gap-3">
+
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+          <FormProvider {...methods}>
+            <form
+              className="flex flex-col gap-5 sm:gap-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <FormInputCreateText
+                type="text"
+                label="Judul Materi"
+                control={control}
+                name="title"
+                placeholder="Masukkan Judul Materi"
+                className="w-full"
+              />
+              <FormInputCreateText
+                type="text"
+                label="Deskripsi"
+                control={control}
+                name="description"
+                placeholder="Masukkan Deskripsi Materi"
+                className="w-full"
+              />
+              <SelectCreateField
+                label="Folder"
+                placeholder="Pilih Folder"
+                className="w-full light"
+                name="folderId"
+              >
+                <option disabled selected value="">
+                  Pilih Folder
+                </option>
+                {folderListData?.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.title}
+                  </option>
+                ))}
+              </SelectCreateField>
+              <FormFileInput
+                control={control}
+                name="file"
+                title="Upload File PDF"
+                description="Pilih file PDF untuk di-generate menjadi flashcard"
+                variant="md"
+                supportFiles={['application/pdf']}
+                accept={{ 'application/pdf': ['.pdf'] }}
+                isRequired
+              />
+              <button
+                className="hover:bg-brand-dark w-full rounded-xl bg-brand-base px-6 py-3 font-semibold text-white shadow-md transition-all hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-400 sm:py-3.5"
+                type="submit"
+                disabled={isPending}
+              >
+                {isPending ? 'Memproses...' : 'Generate Flashcard'}
+              </button>
+            </form>
+          </FormProvider>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="min-h-screen">
+      <div className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="flex h-14 items-center justify-between sm:h-16">
+            <button
+              onClick={() => setIsSubmitted(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-gray-100 sm:h-10 sm:w-10"
+              type="button"
+              aria-label="back"
+            >
+              <MdArrowBackIos className="text-lg text-gray-700 sm:text-xl" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-800 sm:text-xl">
+              Preview Flashcard
+            </h1>
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-gray-100 sm:h-10 sm:w-10"
+              type="button"
+              aria-label="more"
+            >
+              <MdOutlineMoreVert className="text-lg text-gray-700 sm:text-xl" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-4xl px-4 py-6 pb-24 sm:px-6 sm:py-8">
+        <div className="mb-6 rounded-2xl bg-gradient-to-br from-brand-base to-blue-600 p-5 text-white shadow-lg sm:p-6">
+          <p className="mb-2 text-base font-bold sm:text-lg">
+            {generateData?.title}
+          </p>
+          <p className="mb-4 text-sm opacity-90 sm:text-base">
+            {generateData?.description}
+          </p>
+          <div className="flex items-center gap-3 rounded-xl bg-white bg-opacity-20 p-3">
+            <IoDocumentTextOutline className="flex-shrink-0 text-3xl sm:text-4xl" />
+            <div className="flex min-w-0 flex-col">
+              <p className="truncate text-xs font-semibold sm:text-sm">
+                {generateData?.path}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <h3 className="mb-1 text-xl font-bold text-gray-800 sm:text-2xl">
+            Flashcards Generated
+          </h3>
+          <p className="text-sm text-gray-600">
+            {generateData?.flashcards.length} cards dibuat
+          </p>
+        </div>
+
+        <div className="mb-6 flex flex-col gap-3 sm:gap-4">
           {generateData &&
             generateData.flashcards.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col rounded-lg bg-[#F4F4F5] px-3 py-2 shadow-sm"
+                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5"
               >
-                <p className="text-sm font-bold">{item.question}</p>
+                <div className="mb-3 flex items-start gap-2">
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-brand-base text-xs font-bold text-white sm:h-7 sm:w-7 sm:text-sm">
+                    {index + 1}
+                  </span>
+                  <p className="flex-1 text-sm font-bold text-gray-800 sm:text-base">
+                    {item.question}
+                  </p>
+                </div>
                 <Divider className="my-3" />
-                <p className="text-xs">{item.answer}</p>
+                <p className="text-xs leading-relaxed text-gray-600 sm:text-sm">
+                  {item.answer}
+                </p>
               </div>
             ))}
         </div>
-        <Button
-          onClick={() => handleSave()}
-          className="mt-5 w-full rounded-xl bg-[#69C] py-2 text-white"
-        >
-          Selanjutnya
-        </Button>
+
+        <div className="sticky bottom-0 bg-gradient-to-t from-gray-50 pb-6 pt-4">
+          <button
+            onClick={() => handleSave()}
+            disabled={isPendingSave}
+            className="hover:bg-brand-dark w-full rounded-xl bg-brand-base px-6 py-3 text-base font-bold text-white shadow-lg transition-all hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-400 sm:py-4 sm:text-lg"
+          >
+            {isPendingSave ? 'Menyimpan...' : 'Simpan Flashcard'}
+          </button>
+        </div>
       </div>
     </div>
   );

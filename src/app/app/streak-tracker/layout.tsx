@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 
 const Layout = (props: PropsWithChildren) => {
-  return <div className="relative pb-20 md:pb-0">{props?.children}</div>;
+  return <div className="relative">{props?.children}</div>;
 };
 
 export default Layout;

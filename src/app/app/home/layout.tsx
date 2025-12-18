@@ -2,6 +2,7 @@ import { BarChartBig, BookOpen, Home, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 
 import { BottomNavigation } from '@/lib/components/BottomNavigation';
+import { DesktopNavigation } from '@/lib/components/DesktopNavigation';
 
 const items = [
   {
@@ -25,6 +26,7 @@ const items = [
 const Layout = (props: PropsWithChildren) => {
   return (
     <div className="relative flex h-screen w-full flex-col">
+      <DesktopNavigation />
       <div className="container flex-grow overflow-auto">{props?.children}</div>
       <BottomNavigation items={items} />
     </div>

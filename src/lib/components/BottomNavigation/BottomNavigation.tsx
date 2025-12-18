@@ -18,7 +18,7 @@ const BottomNavigation = ({ items }: TBottomNavigationProps) => {
 
   if (isShowNav) {
     return (
-      <div className="absolute bottom-0 z-50 w-full border-t bg-white pb-[14px]">
+      <div className="absolute bottom-0 z-50 w-full border-t bg-white pb-[14px] md:hidden">
         <div className="flex w-full items-center justify-center p-[10px]">
           {items.map((item, i) => (
             <div key={i as number} className="flex-1">

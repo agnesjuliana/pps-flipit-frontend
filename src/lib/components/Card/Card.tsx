@@ -8,7 +8,7 @@ const Card = ({ children, ...props }: CardProps) => {
   return (
     <div
       {...props}
-      className={`rounded-lg border border-gray-100 bg-white p-3 ${props.className}`}
+      className={`rounded-lg border border-gray-100 bg-white p-3 ${props.className || ''}`}
     >
       {children}
     </div>

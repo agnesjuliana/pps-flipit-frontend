@@ -86,7 +86,7 @@ const Page = () => {
       </div>
 
       <div className="flex flex-col gap-3 p-6 pb-24 pt-4">
-        <div className="bg-base-black container flex-col overflow-auto whitespace-nowrap">
+        <div className="container grid grid-cols-1 gap-4 overflow-auto md:grid-cols-2 lg:grid-cols-3">
           {folderListData && folderListData.length > 0 ? (
             folderListData.map((item) => (
               <button

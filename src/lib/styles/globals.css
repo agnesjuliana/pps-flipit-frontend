@@ -38,10 +38,17 @@
 }
 
 .content {
-  max-width: 430px;
+  max-width: 100%;
   margin: auto;
   background: white;
-  height: 100dvh;
+  min-height: 100dvh;
+}
+
+@media (min-width: 768px) {
+  .content {
+    max-width: 1280px;
+    padding: 0 2rem;
+  }
 }
 
 * {
@@ -63,4 +70,13 @@ html {
 .text-streak {
   -webkit-text-stroke: 4px #936316;
   text-stroke: 4px #936316;
+}
+
+/* 3D Card Flip Animation */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }

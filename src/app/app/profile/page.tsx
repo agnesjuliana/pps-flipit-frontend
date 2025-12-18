@@ -32,7 +32,7 @@ export default function ActivityPage() {
   };
 
   return (
-    <section className="relative flex h-screen flex-col items-center p-5">
+    <section className="relative flex h-screen flex-col items-center p-5 md:mx-auto md:max-w-3xl md:p-8">
       <div className="flex w-full items-center justify-between">
         <Link href="/">
           <FaShareAlt className="text-xl text-[#6699CC]" />

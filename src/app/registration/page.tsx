@@ -57,7 +57,7 @@ const Page = () => {
     }
   };
   return (
-    <div className="absolute bottom-0 w-full rounded-t-[32px] bg-white px-[21px] py-10">
+    <div className="absolute bottom-0 w-full rounded-t-[32px] bg-white px-[21px] py-10 md:relative md:mx-auto md:my-10 md:max-w-2xl md:rounded-2xl md:shadow-lg">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-[6px]">
           <p className="text-2xl font-bold leading-8">Selamat Datang</p>

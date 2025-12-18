@@ -36,9 +36,9 @@ export default function ActivityPage() {
     return <div>Error: {monthlyStreakError.message}</div>;
 
   return (
-    <section className="relative flex flex-col">
-      <Image src="/assets/app/head.png" width={646} height={146} />
-      <div className="flex flex-col p-5">
+    <section className="relative flex flex-col md:mx-auto md:max-w-4xl">
+      <Image src="/assets/app/head.png" width={646} height={146} className="w-full" />
+      <div className="flex flex-col p-5 md:p-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Aktivitas</h1>
           <Link href="/">

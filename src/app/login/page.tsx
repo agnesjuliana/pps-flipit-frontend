@@ -22,7 +22,6 @@ import { FormInputText } from '@/lib/components/FormTextInput';
 
 const Page = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { isError, error: errMessage, isPending } = useLogin();
   const router = useRouter();
   const { handleSubmit, control } = useForm<LoginUserType>({
     resolver: zodResolver(LoginUserSchema),
@@ -33,20 +32,25 @@ const Page = () => {
     mode: 'onChange',
   });
 
+  const { mutate, isError, error: errMessage, isPending } = useLogin();
+
   const onError = (error: FieldErrors<LoginUserType>) => {
     console.log(error);
     return error;
   };
 
-  const onSubmit = async (data: LoginUserType) => {
-    try {
-      const loginData = await login(data);
-      localStorage.setItem('token', loginData.token);
-      localStorage.setItem('user', JSON.stringify(loginData));
-      router.push('/app/home');
-    } catch (e) {
-      console.log(e, 'error');
-    }
+  const onSubmit = (data: LoginUserType) => {
+    mutate(data, {
+      onSuccess: (loginData: any) => {
+        localStorage.setItem('token', loginData.token);
+        localStorage.setItem('user', JSON.stringify(loginData));
+        router.push('/app/home');
+      },
+      onError: (e) => {
+        // Error akan otomatis ditangani oleh isError dan errMessage
+        console.log(e, 'error');
+      },
+    });
   };
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-4">

@@ -15,6 +15,7 @@ import type {
 } from '@/app/api/Play/model';
 import { useCreatePlay } from '@/app/api/Play/service';
 import { useUserData } from '@/app/api/Auth/services';
+import { useEffect, useState } from 'react';
 import { getAllFlashcards, getAllFolders } from '@/lib/data/mockData';
 import { cn } from '@/lib/styles/utils';
 import Mascot from '@/lib/assets/home-asset-1.svg';
@@ -24,6 +25,10 @@ import { Card } from '@/lib/components/Card';
 const Page = () => {
   const router = useRouter();
   const userData = useUserData();
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Use mock data
   const folderListData = getAllFolders();
@@ -184,7 +189,7 @@ const Page = () => {
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8">
         <div>
           <h1 className="mb-2 text-3xl font-bold text-brand-base sm:text-4xl md:text-5xl">
-            Hi, {userData.nama} 👋🏻
+            Hi, {isMounted ? userData.nama : ''} 👋🏻
           </h1>
           <p className="text-sm text-gray-600 sm:text-base">
             Selamat datang kembali!

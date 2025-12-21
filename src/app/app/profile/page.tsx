@@ -30,10 +30,15 @@ export default function ActivityPage() {
   if (isMonthlyStreakError)
     return <div>Error: {monthlyStreakError.message}</div>;
 
-  const handleLogout = () => {
-    logout();
-    localStorage.clear();
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      localStorage.clear();
+      router.push('/login');
+    } catch (e) {
+      console.error('Logout error:', e);
+      router.push('/login');
+    }
   };
 
   return (

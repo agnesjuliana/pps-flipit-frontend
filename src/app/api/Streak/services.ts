@@ -53,6 +53,14 @@ const fetchWeeklyStreak = async () => {
   return response.data;
 };
 
+const fetchMonthlyStreak = async () => {
+  // Endpoint: {baseUrl}/quiz/monthly
+  const response = await axios.get(`${baseUrl}/quiz/monthly`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data;
+};
+
 export const useCurrentStreak = () => {
   return useQuery({
     queryKey: ['streakCurrent'],
@@ -64,6 +72,13 @@ export const useWeeklyStreakV2 = () => {
   return useQuery({
     queryKey: ['streakWeekly'],
     queryFn: fetchWeeklyStreak,
+  });
+};
+
+export const useMonthlyStreakV2 = () => {
+  return useQuery({
+    queryKey: ['streakMonthly'],
+    queryFn: fetchMonthlyStreak,
   });
 };
 

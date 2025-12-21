@@ -1,46 +1,88 @@
 'use client';
 
-import { Image } from '@nextui-org/react';
-import { Calendar, Flame, Target, Trophy, TrendingUp } from 'lucide-react';
+import { Calendar, Flame, Target, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+// Hapus useState dan useEffect karena tidak dibutuhkan untuk derived data
+// import { useEffect, useState } from 'react';
 
-import { useMonthlyStreak, useWeeklyStreak } from '@/app/api/Streak/services';
+import {
+  useMonthlyStreakV2,
+  useWeeklyStreakV2,
+  useCurrentStreak,
+} from '@/app/api/Streak/services';
 import { Calendar as CalendarComponent } from '@/app/components/ui/calendar';
 import { Card } from '@/lib/components/Card';
 import { cn } from '@/lib/styles/utils';
 
 export default function StreakTrackerPage() {
-  const [selectedDates, setSelectedDates] = useState<Date[]>();
+  // --- 1. FETCH DATA ---
   const {
-    data: weeklyStreakData,
+    data: weeklyResponse,
     isLoading: isWeeklyLoading,
     isError: isWeeklyError,
     error: weeklyError,
-  } = useWeeklyStreak();
+  } = useWeeklyStreakV2();
 
   const {
-    data: monthlyStreakData,
+    data: monthlyResponse,
     isLoading: isMonthlyLoading,
     isError: isMonthlyError,
     error: monthlyError,
-  } = useMonthlyStreak();
+  } = useMonthlyStreakV2();
 
-  useEffect(() => {
-    if (!isMonthlyLoading && monthlyStreakData) {
-      const newSelectedDates: Date[] = monthlyStreakData.streakMonth
-        .filter((day) => day.isStreak)
-        .map(
-          (day) =>
-            new Date(
-              `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day.day}`
-            )
-        );
-      setSelectedDates(newSelectedDates);
-    }
-  }, [isMonthlyLoading, monthlyStreakData]);
+  const { data: currentStreakResponse, isLoading: isCurrentLoading } =
+    useCurrentStreak();
 
-  if (isWeeklyLoading || isMonthlyLoading)
+  // --- 2. DATA PROCESSING ---
+
+  // A. Monthly Data & Calendar
+  const monthlyData = monthlyResponse?.data?.monthData || [];
+  const totalCorrectMonth = monthlyResponse?.data?.totalCorrect || 0;
+
+  // [OPTIMASI] Hitung selectedDates langsung disini (Derived State)
+  // Tidak perlu useEffect, data akan otomatis ter-update saat monthlyData berubah
+  const selectedDates = monthlyData
+    .filter((d: any) => d.attempts > 0)
+    .map((d: any) => new Date(d.date));
+
+  // B. Today's Stats
+  // Menggunakan new Date() local untuk mencocokkan tanggal hari ini
+  // Note: Pastikan format API YYYY-MM-DD sesuai dengan output lokal
+  const today = new Date().toLocaleDateString('en-CA'); // Format YYYY-MM-DD yang aman timezone
+  const todayStats = monthlyData.find((d: any) => d.date === today);
+  const todayPlays = todayStats?.attempts || 0;
+
+  // C. Weekly Data Mapping
+  const winStreakData = [
+    { keyDay: 'Sun', day: 'Min', isStreak: false },
+    { keyDay: 'Mon', day: 'Sen', isStreak: false },
+    { keyDay: 'Tue', day: 'Sel', isStreak: false },
+    { keyDay: 'Wed', day: 'Rab', isStreak: false },
+    { keyDay: 'Thu', day: 'Kam', isStreak: false },
+    { keyDay: 'Fri', day: 'Jum', isStreak: false },
+    { keyDay: 'Sat', day: 'Sab', isStreak: false },
+  ];
+
+  const weeklyDataList = weeklyResponse?.data?.weekData || [];
+
+  // Pengecekan Array.isArray ini yang memperbaiki error forEach sebelumnya
+  if (Array.isArray(weeklyDataList)) {
+    weeklyDataList.forEach((item: { day: string; attempts: number }) => {
+      const index = winStreakData.findIndex((day) => day.keyDay === item.day);
+      if (index !== -1) {
+        winStreakData[index].isStreak = item.attempts > 0;
+      }
+    });
+  }
+
+  // D. Current Streak
+  const currentStreak = currentStreakResponse?.data?.streakCount ?? 0;
+  // Calculate percentage (Max 30 hari)
+  const streakPercentage = Math.min((currentStreak / 30) * 100, 100);
+
+  // --- 3. RENDERING ---
+
+  if (isWeeklyLoading || isMonthlyLoading || isCurrentLoading)
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -51,34 +93,9 @@ export default function StreakTrackerPage() {
     );
 
   if (isWeeklyError)
-    return <div className="p-6">Error: {weeklyError.message}</div>;
+    return <div className="p-6">Error Weekly: {weeklyError.message}</div>;
   if (isMonthlyError)
-    return <div className="p-6">Error: {monthlyError.message}</div>;
-
-  const weekDays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-  const winStreakData = [
-    { keyDay: 'Monday', day: 'Sen', isStreak: false },
-    { keyDay: 'Tuesday', day: 'Sel', isStreak: false },
-    { keyDay: 'Wednesday', day: 'Rab', isStreak: false },
-    { keyDay: 'Thursday', day: 'Kam', isStreak: false },
-    { keyDay: 'Friday', day: 'Jum', isStreak: false },
-    { keyDay: 'Saturday', day: 'Sab', isStreak: false },
-    { keyDay: 'Sunday', day: 'Min', isStreak: false },
-  ];
-
-  weeklyStreakData?.streakWeek.forEach((item) => {
-    const index = winStreakData.findIndex((day) => day.keyDay === item.day);
-    if (index !== -1) {
-      winStreakData[index].isStreak = item.isStreak;
-    }
-  });
-
-  const currentStreak = weeklyStreakData?.streakTotal || 0;
-  const totalFlashcards = monthlyStreakData?.flashcardTotal || 0;
-  const todayPlays = monthlyStreakData?.todayPlayTotal || 0;
-
-  // Calculate streak percentage (assuming 30 days max for a "perfect" month)
-  const streakPercentage = Math.min((currentStreak / 30) * 100, 100);
+    return <div className="p-6">Error Monthly: {monthlyError.message}</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-blue-50 pb-24 md:pb-8">
@@ -91,10 +108,10 @@ export default function StreakTrackerPage() {
 
         <div className="relative mx-auto max-w-4xl px-6 py-12 md:px-8">
           <Link
-            href="/app/activity"
+            href="/app/home"
             className="mb-4 inline-flex items-center text-brand-100 transition-colors hover:text-white"
           >
-            ← Kembali ke Activity
+            ← Kembali ke Home
           </Link>
 
           <div className="flex items-center justify-between">
@@ -116,10 +133,10 @@ export default function StreakTrackerPage() {
       <div className="mx-auto max-w-4xl px-6 py-8 md:px-8">
         {/* Stats Grid */}
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {/* Current Streak */}
+          {/* Current Streak Card */}
           <Card className="transform border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50 p-6 transition-transform hover:scale-105">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="w-full">
                 <p className="mb-1 text-sm font-medium text-gray-600">
                   Streak Saat Ini
                 </p>
@@ -136,30 +153,30 @@ export default function StreakTrackerPage() {
                   ></div>
                 </div>
               </div>
-              <Flame className="h-12 w-12 text-orange-500" />
+              <Flame className="ml-2 h-12 w-12 flex-shrink-0 text-orange-500" />
             </div>
           </Card>
 
-          {/* Total Flashcards */}
+          {/* Total Flashcards Card */}
           <Card className="transform border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 transition-transform hover:scale-105">
             <div className="flex items-start justify-between">
               <div>
                 <p className="mb-1 text-sm font-medium text-gray-600">
-                  Total Flashcard
+                  Total Benar (Bulan Ini)
                 </p>
                 <div className="flex items-baseline gap-2">
                   <h2 className="text-5xl font-bold text-blue-600">
-                    {totalFlashcards}
+                    {totalCorrectMonth}
                   </h2>
-                  <span className="text-xl text-gray-500">cards</span>
+                  <span className="text-xl text-gray-500">soal</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">Sudah dikerjakan</p>
+                <p className="mt-2 text-sm text-gray-500">Terus tingkatkan!</p>
               </div>
               <Target className="h-12 w-12 text-blue-500" />
             </div>
           </Card>
 
-          {/* Today's Activity */}
+          {/* Today's Activity Card */}
           <Card className="transform border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-6 transition-transform hover:scale-105">
             <div className="flex items-start justify-between">
               <div>
@@ -172,7 +189,9 @@ export default function StreakTrackerPage() {
                   </h2>
                   <span className="text-xl text-gray-500">kali</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">Terus semangat!</p>
+                <p className="mt-2 text-sm text-gray-500">
+                  {todayPlays > 0 ? 'Bagus sekali!' : 'Ayo mulai belajar!'}
+                </p>
               </div>
               <TrendingUp className="h-12 w-12 text-green-500" />
             </div>
@@ -226,7 +245,11 @@ export default function StreakTrackerPage() {
             </h3>
           </div>
           <div className="flex justify-center p-6">
-            <CalendarComponent mode="multiple" selected={selectedDates} />
+            <CalendarComponent
+              mode="multiple"
+              selected={selectedDates} // Data langsung dari variabel, bukan state
+              className="rounded-md border shadow"
+            />
           </div>
         </Card>
 
@@ -234,90 +257,41 @@ export default function StreakTrackerPage() {
         <Card className="overflow-hidden border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-0">
           <div className="bg-gradient-to-r from-yellow-500 to-amber-600 px-6 py-4">
             <h3 className="flex items-center gap-2 text-xl font-bold text-white">
-              <Trophy className="h-6 w-6" />
-              Pencapaian
+              <Target className="h-6 w-6" />
+              Pencapaian Streak
             </h3>
           </div>
           <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-4">
-            <div className="text-center">
-              <div
-                className={cn(
-                  'mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full',
-                  currentStreak >= 3
-                    ? 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                    : 'bg-gray-200'
-                )}
-              >
-                <Flame
+            {[
+              { days: 3, label: 'Pemula', color: 'bg-yellow-500' },
+              { days: 7, label: 'Konsisten', color: 'bg-orange-500' },
+              { days: 14, label: 'Dedikasi', color: 'bg-purple-500' },
+              { days: 30, label: 'Master', color: 'bg-red-500' },
+            ].map((milestone) => (
+              <div key={milestone.days} className="text-center">
+                <div
                   className={cn(
-                    'h-8 w-8',
-                    currentStreak >= 3 ? 'text-white' : 'text-gray-400'
+                    'mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full transition-all',
+                    currentStreak >= milestone.days
+                      ? `bg-gradient-to-br ${milestone.color.replace('bg-', 'from-')} to-${milestone.color.replace('bg-', '')}-700 shadow-md`
+                      : 'bg-gray-200 grayscale'
                   )}
-                />
+                >
+                  <Flame
+                    className={cn(
+                      'h-8 w-8',
+                      currentStreak >= milestone.days
+                        ? 'text-white'
+                        : 'text-gray-400'
+                    )}
+                  />
+                </div>
+                <p className="text-xs font-bold text-gray-800">
+                  {milestone.days} Hari
+                </p>
+                <p className="text-xs text-gray-500">{milestone.label}</p>
               </div>
-              <p className="text-xs font-semibold">3 Hari Berturut</p>
-              <p className="text-xs text-gray-500">Pemula</p>
-            </div>
-
-            <div className="text-center">
-              <div
-                className={cn(
-                  'mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full',
-                  currentStreak >= 7
-                    ? 'bg-gradient-to-br from-orange-400 to-orange-600'
-                    : 'bg-gray-200'
-                )}
-              >
-                <Flame
-                  className={cn(
-                    'h-8 w-8',
-                    currentStreak >= 7 ? 'text-white' : 'text-gray-400'
-                  )}
-                />
-              </div>
-              <p className="text-xs font-semibold">7 Hari Berturut</p>
-              <p className="text-xs text-gray-500">Konsisten</p>
-            </div>
-
-            <div className="text-center">
-              <div
-                className={cn(
-                  'mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full',
-                  currentStreak >= 14
-                    ? 'bg-gradient-to-br from-purple-400 to-purple-600'
-                    : 'bg-gray-200'
-                )}
-              >
-                <Trophy
-                  className={cn(
-                    'h-8 w-8',
-                    currentStreak >= 14 ? 'text-white' : 'text-gray-400'
-                  )}
-                />
-              </div>
-              <p className="text-xs font-semibold">14 Hari Berturut</p>
-              <p className="text-xs text-gray-500">Dedikasi</p>
-            </div>
-
-            <div className="text-center">
-              <div
-                className={cn(
-                  'mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full',
-                  currentStreak >= 30
-                    ? 'bg-gradient-to-br from-red-400 to-red-600'
-                    : 'bg-gray-200'
-                )}
-              >
-                <Trophy
-                  className={cn(
-                    'h-8 w-8',
-                    currentStreak >= 30 ? 'text-white' : 'text-gray-400'
-                  )}
-                />
-              </div>
-              <p className="text-xs font-semibold">30 Hari Berturut</p>
-              <p className="text-xs text-gray-500">Master</p>
-            </div>
+            ))}
           </div>
         </Card>
       </div>

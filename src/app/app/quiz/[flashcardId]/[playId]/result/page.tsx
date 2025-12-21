@@ -2,36 +2,30 @@
 'use client';
 
 import { Image } from '@nextui-org/react';
-import { useParams, useRouter } from 'next/navigation';
-import { RiCloseLine } from 'react-icons/ri';
+import { useRouter, useParams } from 'next/navigation';
+import { RiCloseLine, RiBookOpenLine } from 'react-icons/ri';
 import Fire from '@/lib/assets/fire.svg';
 
-// Import kedua hook (Weekly & Current)
+// Pastikan path import ini sesuai dengan file services Anda
 import { useWeeklyStreakV2, useCurrentStreak } from '@/app/api/Streak/services';
 
 const Page = () => {
   const router = useRouter();
   const params = useParams();
-  const { flashcardId, playId } = params;
+
+  const flashcardId = params.flashcardId as string;
+  const playId = params.playId as string;
 
   // --- 1. Fetch Data API ---
-  const {
-    data: weeklyResponse,
-    isLoading: isWeeklyLoading,
-    isError: isWeeklyError,
-    error: weeklyError,
-  } = useWeeklyStreakV2();
+  const { data: weeklyResponse, isLoading: isWeeklyLoading } =
+    useWeeklyStreakV2();
 
   const { data: currentStreakResponse, isLoading: isCurrentLoading } =
     useCurrentStreak();
 
-  // --- 2. Loading & Error Handling ---
-  if (isWeeklyLoading || isCurrentLoading) return <div>Loading...</div>;
-  if (isWeeklyError) return <div>Error: {weeklyError.message}</div>;
+  // --- 2. Data Preparation ---
 
-  // --- 3. Data Processing ---
-
-  // Template Data UI (Indonesian Days)
+  // Default UI Structure untuk 7 Hari
   const winStreakData = [
     { keyDay: 'Sun', day: 'Min', isStreak: false },
     { keyDay: 'Mon', day: 'Sen', isStreak: false },
@@ -42,31 +36,43 @@ const Page = () => {
     { keyDay: 'Sat', day: 'Sab', isStreak: false },
   ];
 
-  // Mapping Weekly Data dari API ke UI
+  // Mapping Data Weekly (API -> UI)
+  // Struktur API: response.data.weekData -> Array[{ day: "Sun", attempts: 0 }, ...]
   const weeklyData = weeklyResponse?.data?.weekData || [];
 
   if (Array.isArray(weeklyData)) {
     weeklyData.forEach((item: { day: string; attempts: number }) => {
-      // Cari hari yang sesuai
-      const index = winStreakData.findIndex((day) => day.keyDay === item.day);
+      // Cari hari yang cocok (API "Sun" == UI keyDay "Sun")
+      const index = winStreakData.findIndex((d) => d.keyDay === item.day);
+
       if (index !== -1) {
-        // Logic: Jika attempts > 0, tandai sebagai streak (api)
+        // Logic: Jika attempts > 0, berarti streak hari itu aktif
         winStreakData[index].isStreak = item.attempts > 0;
       }
     });
   }
 
-  // Ambil Angka Streak Saat Ini dari API Current
+  // Mapping Data Current Streak (API -> UI)
+  // Struktur API: response.data.streakCount
   const currentStreakCount = currentStreakResponse?.data?.streakCount ?? 0;
 
-  // --- 4. Handlers ---
+  // --- 3. Handlers ---
   const handleClose = () => {
     router.push('/app/home');
   };
 
-  const handleStartQuiz = () => {
-    router.push(`/app/quiz/${flashcardId}/${playId}`);
+  const handlePembahasan = () => {
+    router.push(`/app/quiz/${flashcardId}/${playId}/pembahasan`);
   };
+
+  // --- 4. Component UI ---
+  if (isWeeklyLoading || isCurrentLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-base border-t-transparent" />
+      </div>
+    );
+  }
 
   const StreakIndicator = ({
     day,
@@ -101,7 +107,7 @@ const Page = () => {
       </div>
 
       <div className="relative z-20 flex flex-1 flex-col items-center justify-center pb-32 sm:pb-40 md:flex-row md:items-center md:gap-8 md:pb-8 lg:gap-12">
-        {/* Mascot - Left side on desktop */}
+        {/* Mascot - Desktop */}
         <div className="hidden md:flex md:flex-1 md:items-end md:justify-end">
           <Image
             src="/assets/app/streak-hero.png"
@@ -113,7 +119,7 @@ const Page = () => {
 
         {/* Content Container */}
         <div className="relative flex w-full max-w-md flex-col items-center md:flex-1 md:items-start">
-          {/* Streak Number (DATA REAL DARI API) */}
+          {/* Big Streak Number (Current Streak) */}
           <div className="relative flex items-center justify-center md:items-end md:justify-start ">
             <h1 className="relative z-10 text-[100px] font-extrabold sm:text-8xl md:text-7xl">
               {currentStreakCount}
@@ -127,16 +133,16 @@ const Page = () => {
           </div>
 
           <h2 className="relative z-10 mt-6 text-3xl text-[#FEC536] sm:mt-9 sm:text-5xl md:text-4xl">
-            Streak
+            Streak Aman!
           </h2>
 
           <div className="relative z-10 mt-4 flex flex-col items-center gap-6 sm:mt-7 md:items-start">
-            <p className="max-w-xs text-center text-sm text-[#52525B] sm:max-w-sm sm:text-base md:max-w-[320px] md:text-left">
-              Mau dapat <b>Streak</b> hari ini? <br />
-              Ayo kerjakan quiznya sekarang!
+            <p className="max-w-xs text-center text-xs text-[#52525B] sm:max-w-sm sm:text-sm md:max-w-[290px] md:text-left">
+              Kamu hebat! Rekor <b>Streak</b> harianmu berhasil diperbarui hari
+              ini.
             </p>
 
-            {/* Indicator Mingguan (DATA REAL DARI API) */}
+            {/* Streak Indicators (Weekly Data) */}
             <div className="flex justify-between gap-2 sm:gap-3">
               {winStreakData.map((item, i) => (
                 <StreakIndicator
@@ -147,19 +153,22 @@ const Page = () => {
               ))}
             </div>
 
-            {/* Tombol Menuju Quiz */}
-            <button
-              type="button"
-              onClick={handleStartQuiz}
-              className="mt-2 w-full rounded-xl bg-orange-500 px-8 py-3 font-bold text-white shadow-lg transition-transform hover:bg-orange-600 active:scale-95 sm:w-auto"
-            >
-              Mulai Quiz 🚀
-            </button>
+            {/* Action Button */}
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={handlePembahasan}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-100 px-6 py-3 font-bold text-blue-700 transition-transform hover:bg-blue-200 active:scale-95 sm:w-auto"
+              >
+                <RiBookOpenLine className="text-xl" />
+                Lihat Pembahasan
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mascot - Mobile Bottom */}
+      {/* Mascot Mobile */}
       <Image
         src="/assets/app/streak-hero.png"
         className="pointer-events-none absolute bottom-0 left-1/2 z-10 w-full max-w-xs -translate-x-1/2 sm:max-w-lg md:hidden"

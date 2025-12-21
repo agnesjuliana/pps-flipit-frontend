@@ -1,4 +1,5 @@
 import { useQuery, type QueryFunctionContext } from '@tanstack/react-query';
+import axios from 'axios';
 
 // Define the type for weekly streak data
 interface WeeklyStreak {
@@ -24,6 +25,47 @@ if (typeof window !== 'undefined') {
   accessToken = localStorage.getItem('token') || '';
 }
 const baseUrl = process.env.BASE_URL;
+
+const getAuthHeaders = () => {
+  // Cek apakah kode berjalan di browser (Client Side)
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return {
+        Authorization: `Bearer ${token}`,
+      };
+    }
+  }
+  return {};
+};
+
+const fetchCurrentStreak = async () => {
+  const response = await axios.get(`${baseUrl}/streak/current`, {
+    headers: getAuthHeaders(), // <--- Tambahkan Header disini
+  });
+  return response.data;
+};
+
+const fetchWeeklyStreak = async () => {
+  const response = await axios.get(`${baseUrl}/quiz/weekly`, {
+    headers: getAuthHeaders(), // <--- Tambahkan Header disini
+  });
+  return response.data;
+};
+
+export const useCurrentStreak = () => {
+  return useQuery({
+    queryKey: ['streakCurrent'],
+    queryFn: fetchCurrentStreak,
+  });
+};
+
+export const useWeeklyStreakV2 = () => {
+  return useQuery({
+    queryKey: ['streakWeekly'],
+    queryFn: fetchWeeklyStreak,
+  });
+};
 
 const weeklyStreakQueryOptions = {
   queryKey: ['weeklyStreak'],

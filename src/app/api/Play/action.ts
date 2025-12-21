@@ -7,6 +7,8 @@ import {
   type CreatePlayResultType,
   type CreatePlayType,
 } from './model';
+import axios from 'axios';
+const baseUrl = process.env.BASE_URL;
 
 export const createPlay = async (playData: CreatePlayType) => {
   try {
@@ -92,5 +94,34 @@ export const finishPlay = async (playId: number) => {
   } catch (e: any) {
     console.error('Finish play error:', e);
     throw new Error(e.message || 'An error occurred while finishing the play');
+  }
+};
+
+export const finishQuiz = async (
+  playId: number,
+  totalQuestions: number,
+  correctAnswers: number
+) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+
+  try {
+    const payload = {
+      totalQuestions,
+      correctAnswers,
+    };
+
+    console.log('[FINISH PLAY] Submitting:', payload);
+
+    const res = await axios.post(`${baseUrl}/quiz/submit`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.data;
+  } catch (error: any) {
+    console.error('[FINISH PLAY] Error:', error.response?.data);
+    throw new Error(error.response?.data?.message || 'Failed to finish quiz');
   }
 };

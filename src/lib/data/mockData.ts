@@ -497,3 +497,158 @@ export const finishMockPlay = (playId: number): MockPlay | undefined => {
 export const getMockPlayById = (playId: number): MockPlay | undefined => {
   return mockPlays.find((p) => p.id === playId);
 };
+
+export interface MockSimulationItem {
+  id: number;
+  simulationId: number;
+  scenarioTitle: string; // Judul skenario (misal: "Email dari Bank")
+  htmlContent: string; // HTML Wrapper untuk tampilan Browser/Email
+  isPhishing: boolean; // Kunci Jawaban: True (Bahaya) / False (Aman)
+  explanation: string; // Penjelasan detail kenapa Aman/Bahaya (muncul di Result)
+}
+
+export interface MockSimulation {
+  id: number;
+  title: string; // Judul Simulasi (misal: "Latihan Deteksi Email")
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  items: MockSimulationItem[];
+}
+
+// Data Mock Simulasi (Objek Baru)
+export const mockSimulations: MockSimulation[] = [
+  {
+    id: 1,
+    title: 'Simulasi Deteksi Email Phishing',
+    description:
+      'Uji kemampuanmu membedakan email asli dan palsu dalam skenario nyata.',
+    difficulty: 'Medium',
+    items: [
+      // --- SKENARIO 1: BANK BRI PALSU ---
+      {
+        id: 1,
+        simulationId: 1,
+        scenarioTitle: 'Peringatan Keamanan Bank',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Domain pengirim "@bri-security-alert.com" bukan domain resmi bank. Bank tidak pernah meminta aktivasi ulang rekening melalui link email.',
+        htmlContent: `
+          <div class="flex flex-col gap-4 font-sans text-gray-800 h-full">
+            <div class="border-b border-gray-200 pb-3">
+              <h2 class="font-bold text-lg text-red-600">PERINGATAN: Akses Mobile Banking Dibekukan</h2>
+              <div class="flex items-start gap-3 mt-3">
+                <div class="w-10 h-10 rounded bg-blue-800 flex items-center justify-center text-white font-bold text-xs">BRI</div>
+                <div class="text-sm">
+                   <p class="font-bold">Bank Rakyat Indonesia <span class="font-normal text-gray-500">&lt;admin@bri-security-alert.com&gt;</span></p>
+                   <p class="text-xs text-gray-400">Kepada: nasabah@gmail.com</p>
+                </div>
+              </div>
+            </div>
+            <div class="text-sm space-y-3">
+               <p>Yth. Nasabah,</p>
+               <p>Kami mendeteksi aktivitas login mencurigakan. Demi keamanan, akun Anda telah <strong>DINONAKTIFKAN</strong>.</p>
+               <div class="py-4 flex justify-center">
+                 <a href="http://bri-mobile-reset.xyz/login" class="bg-blue-600 text-white px-6 py-3 rounded shadow-md text-sm font-bold no-underline hover:bg-blue-700">
+                    AKTIFKAN KEMBALI
+                 </a>
+               </div>
+            </div>
+          </div>
+        `,
+      },
+
+      // --- SKENARIO 2: NETFLIX PALSU ---
+      {
+        id: 2,
+        simulationId: 1,
+        scenarioTitle: 'Tagihan Berlangganan',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Link mengarah ke "netflix-payment-update.net", bukan situs resmi Netflix.com. Penipu memanfaatkan rasa takut kehilangan layanan.',
+        htmlContent: `
+           <div class="flex flex-col h-full bg-black text-white p-4 rounded-lg font-sans">
+              <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                 <span class="text-red-600 font-bold text-2xl tracking-widest">NETFLIX</span>
+                 <div class="text-right text-xs text-gray-400">
+                    <p>&lt;support@netflix-payment-update.net&gt;</p>
+                 </div>
+              </div>
+              <div class="flex-1 text-center flex flex-col items-center justify-center gap-4">
+                 <h3 class="text-xl font-bold">Pembayaran Gagal</h3>
+                 <p class="text-gray-300 text-sm">Keanggotaan Anda akan dibatalkan dalam 48 jam.</p>
+                 <a href="http://netflix-secure-billing.com/update" class="w-full bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 no-underline text-sm uppercase">
+                    Perbarui Pembayaran
+                 </a>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 3: GOOGLE ASLI ---
+      {
+        id: 3,
+        simulationId: 1,
+        scenarioTitle: 'Notifikasi Login Baru',
+        isPhishing: false,
+        explanation:
+          'Aman. Email berasal dari domain resmi "@accounts.google.com" dan link mengarah ke "google.com". Email ini hanya bersifat notifikasi, tidak meminta password.',
+        htmlContent: `
+           <div class="flex flex-col gap-4 font-sans text-gray-800 p-2">
+              <div class="flex items-center gap-3 mb-2">
+                 <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">G</div>
+                 <div class="text-sm">
+                    <p class="font-bold">Google</p>
+                    <p class="text-xs text-gray-500">&lt;no-reply@accounts.google.com&gt;</p>
+                 </div>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-4 shadow-sm">
+                 <h2 class="text-lg font-medium mb-2">Login baru di Redmi Note 10</h2>
+                 <p class="text-sm text-gray-600 mb-4">Jika ini Anda, abaikan pesan ini.</p>
+                 <a href="https://myaccount.google.com/notifications" class="text-blue-600 text-sm font-bold border border-blue-600 px-4 py-2 rounded hover:bg-blue-50 inline-block">
+                    Cek Aktivitas
+                 </a>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 4: HRD PALSU (SPEAR PHISHING) ---
+      {
+        id: 4,
+        simulationId: 1,
+        scenarioTitle: 'Memo Internal Kantor',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Ini adalah Spear Phishing. Portal internal kantor seharusnya tidak menggunakan domain publik aneh seperti "office-portal-login.net".',
+        htmlContent: `
+           <div class="flex flex-col gap-3 font-sans text-gray-800">
+              <div class="bg-blue-900 text-white p-3 rounded-t-lg -mx-2 -mt-2">
+                 <p class="font-bold text-sm">INTERNAL HR MEMO</p>
+              </div>
+              <div class="text-xs text-gray-500 border-b pb-2">
+                 <p>From: <strong>HRD Manager</strong> &lt;staff@office-hrd-portal.net&gt;</p>
+                 <p>Subject: <strong>Kenaikan Gaji 2025</strong></p>
+              </div>
+              <div class="text-sm space-y-2 mt-2">
+                 <p>Halo Tim, harap login untuk menyetujui penyesuaian gaji baru.</p>
+                 <div class="py-2">
+                    <a href="http://office-portal-login.net/employee/salary" class="text-blue-600 underline font-medium">
+                       Lihat Dokumen (PDF)
+                    </a>
+                 </div>
+              </div>
+           </div>
+        `,
+      },
+    ],
+  },
+];
+
+export const getAllSimulations = () => mockSimulations;
+export const getSimulationById = (id: number) =>
+  mockSimulations.find((s) => s.id === id);
+
+export const getSimulationItems = (simulationId: number) => {
+  const simulation = mockSimulations.find((s) => s.id === simulationId);
+  return simulation ? simulation.items : [];
+};

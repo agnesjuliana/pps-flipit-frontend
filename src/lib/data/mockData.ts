@@ -800,6 +800,173 @@ export const mockSimulations: MockSimulation[] = [
       },
     ],
   },
+  {
+    id: 3,
+    title: 'Simulasi: Website Phishing & URL Analysis',
+    description:
+      'Pelajari cara mendeteksi website palsu yang mencoba mencuri data login Anda.',
+    difficulty: 'Medium',
+    items: [
+      // --- SKENARIO 1: TYPOSQUATTING (FACEBOOK) ---
+      {
+        id: 201,
+        simulationId: 3,
+        scenarioTitle: 'Halaman Login Media Sosial',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Perhatikan URL di address bar. Tertulis "faceboook.com" (huruf "o" ada 3). Ini adalah teknik "Typosquatting". Tampilan bisa sangat mirip asli, tapi URL tidak pernah bohong.',
+        htmlContent: `
+           <div class="flex flex-col h-full bg-gray-100 font-sans text-gray-800">
+              <div class="bg-white border-b p-2 flex items-center gap-2 shadow-sm">
+                 <div class="flex gap-1">
+                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                 </div>
+                 <div class="flex-1 bg-gray-100 rounded px-3 py-1 text-xs text-gray-600 flex items-center gap-2">
+                    <span class="text-green-600">🔒</span>
+                    https://www.faceboook.com/login
+                 </div>
+              </div>
+
+              <div class="flex flex-col items-center justify-center flex-1 p-4">
+                 <h1 class="text-blue-600 text-4xl font-bold mb-8">facebook</h1>
+                 <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-xs text-center">
+                    <p class="text-sm mb-4">Log in to Facebook</p>
+                    <input type="text" placeholder="Email or Phone Number" class="w-full mb-3 px-3 py-2 border rounded text-sm bg-gray-50" disabled />
+                    <input type="password" placeholder="Password" class="w-full mb-4 px-3 py-2 border rounded text-sm bg-gray-50" disabled />
+                    <button class="w-full bg-blue-600 text-white font-bold py-2 rounded text-sm hover:bg-blue-700">Log In</button>
+                    <p class="text-xs text-blue-500 mt-4 cursor-pointer">Forgotten account?</p>
+                 </div>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 2: CRYPTO SCAM (Giveaway) ---
+      {
+        id: 202,
+        simulationId: 3,
+        scenarioTitle: 'Website Giveaway Kripto',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Hati-hati dengan janji melipatgandakan uang (Send 1 ETH, Get 2 ETH). Ini adalah penipuan klasik. Selain itu, domain "tesla-giveaway-event.org" tidak ada hubungannya dengan situs resmi Tesla atau Elon Musk.',
+        htmlContent: `
+           <div class="flex flex-col h-full bg-slate-900 font-sans text-white">
+              <div class="bg-gray-800 border-b border-gray-700 p-2 flex items-center gap-2">
+                 <div class="flex gap-1 opacity-50"><div class="w-3 h-3 rounded-full bg-white"></div></div>
+                 <div class="flex-1 bg-gray-900 rounded px-3 py-1 text-xs text-gray-300 flex items-center gap-2 border border-gray-700">
+                    <span class="text-gray-500">🔒</span>
+                    https://tesla-giveaway-event.org
+                 </div>
+              </div>
+
+              <div class="p-4 flex flex-col items-center text-center overflow-y-auto">
+                 <div class="bg-orange-500 text-xs font-bold px-2 py-1 rounded mb-4">LIVE EVENT</div>
+                 <h2 class="text-2xl font-bold mb-2">Elon Musk 5,000 BTC Giveaway!</h2>
+                 <p class="text-gray-400 text-sm mb-6">To verify your address, just send 0.1 to 1 BTC to the address below and get 0.2 to 2 BTC back immediately!</p>
+                 
+                 <div class="bg-gray-800 p-4 rounded-lg border border-orange-500 w-full mb-4 relative">
+                    <p class="text-[10px] text-gray-500 mb-1 text-left">Payment Address:</p>
+                    <p class="font-mono text-xs break-all text-orange-400">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+                    
+                    <div class="mt-4 h-1 w-full bg-gray-700 rounded-full overflow-hidden">
+                       <div class="h-full bg-orange-500 w-3/4 animate-pulse"></div>
+                    </div>
+                    <p class="text-[10px] text-right mt-1">Left: 450 BTC</p>
+                 </div>
+
+                 <button class="bg-blue-600 w-full py-2 rounded font-bold text-sm">Participate</button>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 3: MICROSOFT 365 LOGIN (Aman) ---
+      {
+        id: 203,
+        simulationId: 3,
+        scenarioTitle: 'Login Portal Kantor',
+        isPhishing: false,
+        explanation:
+          'Aman. URL adalah "login.microsoftonline.com", yang merupakan domain resmi Microsoft untuk layanan login Office 365. Sertifikat SSL valid (gembok) dan tampilan standar.',
+        htmlContent: `
+           <div class="flex flex-col h-full bg-white font-sans text-gray-800">
+              <div class="bg-gray-100 border-b p-2 flex items-center gap-2">
+                 <div class="flex-1 bg-white rounded px-3 py-1 text-xs text-gray-600 flex items-center gap-2 border shadow-sm">
+                    <span class="text-green-600">🔒</span>
+                    https://login.microsoftonline.com/common/oauth2/...
+                 </div>
+              </div>
+
+              <div class="flex-1 flex items-center justify-center p-6 bg-[url('https://img.freepik.com/free-photo/blur-background_1203-7957.jpg')] bg-cover">
+                 <div class="bg-white p-8 shadow-xl w-full max-w-sm">
+                    <div class="mb-4">
+                       <span class="font-bold text-lg text-gray-700 italic">Microsoft</span>
+                    </div>
+                    <h2 class="text-xl font-semibold mb-2">Sign in</h2>
+                    
+                    <input type="email" value="andi@kantor-kita.co.id" class="w-full border-b border-gray-400 py-2 mb-4 text-sm focus:border-blue-600 outline-none" readonly />
+                    <p class="text-xs text-gray-500 mb-6">Enter the password for your work account</p>
+                    
+                    <input type="password" placeholder="Password" class="w-full border-b border-gray-400 py-2 mb-8 text-sm focus:border-blue-600 outline-none" disabled />
+                    
+                    <div class="flex justify-end">
+                       <button class="bg-blue-600 text-white px-8 py-2 text-sm font-bold hover:bg-blue-700">Sign in</button>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 4: SUBDOMAIN TRICK (DANA Palsu) ---
+      {
+        id: 204,
+        simulationId: 3,
+        scenarioTitle: 'Klaim Saldo DANA Kaget',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Perhatikan struktur URL-nya: "dana.id-claim-saldo.com". Ini bukan website DANA. Domain aslinya adalah "id-claim-saldo.com" (subdomain trick), sedangkan website resmi DANA hanyalah "dana.id".',
+        htmlContent: `
+           <div class="flex flex-col h-full bg-blue-500 font-sans text-white">
+              <div class="bg-black/20 p-3 text-center text-xs backdrop-blur-sm">
+                 <div class="bg-white/90 text-black rounded-full px-4 py-1.5 flex items-center justify-center gap-2 mx-auto max-w-[200px]">
+                    <span class="text-gray-500 text-[10px]">🔒</span>
+                    dana.id-claim-saldo.com
+                 </div>
+              </div>
+
+              <div class="flex-1 flex flex-col items-center justify-center p-6 text-center gap-6">
+                 <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                    <span class="text-blue-500 font-bold text-2xl">DANA</span>
+                 </div>
+                 
+                 <div>
+                    <h1 class="text-2xl font-bold mb-2">DANA KAGET!</h1>
+                    <p class="text-blue-100 text-sm">Selamat! Nomor Anda terpilih mendapatkan saldo Rp 2.000.000</p>
+                 </div>
+
+                 <div class="bg-white text-gray-800 p-4 rounded-xl w-full shadow-lg">
+                    <p class="text-xs text-gray-500 mb-2 text-left">Masukkan PIN DANA untuk klaim:</p>
+                    <div class="flex justify-center gap-2 mb-4">
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                       <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                    </div>
+                    <button class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-blue-600">
+                       KLAIM SEKARANG
+                    </button>
+                 </div>
+              </div>
+           </div>
+        `,
+      },
+    ],
+  },
 ];
 
 export const getAllSimulations = () => mockSimulations;

@@ -47,7 +47,6 @@ const Page = () => {
         router.push('/app/home');
       },
       onError: (e) => {
-        // Error akan otomatis ditangani oleh isError dan errMessage
         console.log(e, 'error');
       },
     });

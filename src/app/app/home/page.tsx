@@ -4,7 +4,6 @@
 /* eslint-disable no-unused-vars */
 
 'use client';
-
 import { Book, Copy, Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -21,6 +20,55 @@ import { cn } from '@/lib/styles/utils';
 import Mascot from '@/lib/assets/home-asset-1.svg';
 import Fire from '@/lib/assets/fire.svg';
 import { Card } from '@/lib/components/Card';
+
+// --- KOMPONEN DIPINDAHKAN KELUAR (Best Practice) ---
+
+const StreakIndicator = ({
+  day,
+  isStreak,
+}: {
+  day: string;
+  isStreak: boolean;
+}) => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-1">
+      <p className="rounded-md bg-gray-100 px-1 text-xs font-semibold sm:text-sm">
+        {day}
+      </p>
+      {isStreak ? (
+        <Fire
+          style={{ width: '20px', height: '20px' }}
+          className="sm:h-[26px] sm:w-[26px]"
+        />
+      ) : (
+        <div className="h-5 w-5 rounded-full bg-gray-300 sm:h-[26px] sm:w-[26px]" />
+      )}
+    </div>
+  );
+};
+
+const SectionTitle = ({
+  title,
+  subtitle,
+  titleColor,
+}: {
+  title: string;
+  subtitle?: string;
+  titleColor?: string;
+}) => {
+  return (
+    <div className="mt-2 flex flex-wrap items-baseline gap-1">
+      <p
+        className={cn(
+          `text-lg font-bold sm:text-xl md:text-2xl ${titleColor ?? 'text-black'}`
+        )}
+      >
+        {title}
+      </p>
+      <p className="text-xs sm:text-sm">{subtitle}</p>
+    </div>
+  );
+};
 
 const Page = () => {
   const router = useRouter();
@@ -60,53 +108,6 @@ const Page = () => {
   const handleFolderClick = async (folderId: number, folderTitle: string) => {
     const path = folderTitle.replace(/\s/g, '-');
     router.push(`/app/folder/${folderId}/${path}`);
-  };
-
-  const StreakIndicator = ({
-    day,
-    isStreak,
-  }: {
-    day: string;
-    isStreak: boolean;
-  }) => {
-    return (
-      <div className="flex flex-col items-center justify-center gap-1">
-        <p className="rounded-md bg-gray-100 px-1 text-xs font-semibold sm:text-sm">
-          {day}
-        </p>
-        {isStreak ? (
-          <Fire
-            style={{ width: '20px', height: '20px' }}
-            className="sm:h-[26px] sm:w-[26px]"
-          />
-        ) : (
-          <div className="h-5 w-5 rounded-full bg-gray-300 sm:h-[26px] sm:w-[26px]" />
-        )}
-      </div>
-    );
-  };
-
-  const SectionTitle = ({
-    title,
-    subtitle,
-    titleColor,
-  }: {
-    title: string;
-    subtitle?: string;
-    titleColor?: string;
-  }) => {
-    return (
-      <div className="mt-2 flex flex-wrap items-baseline gap-1">
-        <p
-          className={cn(
-            `text-lg font-bold sm:text-xl md:text-2xl ${titleColor ?? 'text-black'}`
-          )}
-        >
-          {title}
-        </p>
-        <p className="text-xs sm:text-sm">{subtitle}</p>
-      </div>
-    );
   };
 
   const FlashCardRecently = ({

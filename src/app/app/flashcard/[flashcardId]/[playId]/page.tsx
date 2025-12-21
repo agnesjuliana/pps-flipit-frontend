@@ -31,7 +31,7 @@ const Page = () => {
 
   const [isFliped, setIsFliped] = useState(false);
   const [position, setPosition] = useState(0);
-  const [progress, setProgress] = useState<number>(0); // Properly initialize progress state
+  const [progress, setProgress] = useState<number>(0);
 
   // Use mock data
   const flashcardData = getFlashcardById(Number(flashcardId));
@@ -65,7 +65,10 @@ const Page = () => {
           mutateFinish(Number(playId), {
             onSuccess: (response) => {
               const finishData = response.data;
-              router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
+              // UPDATE DISINI: Redirect ke interval-menu
+              router.push(
+                `/app/flashcard/${flashcardId}/${playId}/interval-menu`
+              );
             },
           });
         } else {
@@ -95,7 +98,10 @@ const Page = () => {
               const finishData = response.data;
               queryClient.invalidateQueries({ queryKey: ['weeklyStreak'] });
               queryClient.invalidateQueries({ queryKey: ['monthlyStreak'] });
-              router.push(`/app/flashcard/${flashcardId}/${playId}/result`);
+
+              router.push(
+                `/app/flashcard/${flashcardId}/${playId}/interval-menu`
+              );
             },
           });
         } else {

@@ -501,15 +501,15 @@ export const getMockPlayById = (playId: number): MockPlay | undefined => {
 export interface MockSimulationItem {
   id: number;
   simulationId: number;
-  scenarioTitle: string; // Judul skenario (misal: "Email dari Bank")
-  htmlContent: string; // HTML Wrapper untuk tampilan Browser/Email
-  isPhishing: boolean; // Kunci Jawaban: True (Bahaya) / False (Aman)
-  explanation: string; // Penjelasan detail kenapa Aman/Bahaya (muncul di Result)
+  scenarioTitle: string;
+  htmlContent: string;
+  isPhishing: boolean;
+  explanation: string;
 }
 
 export interface MockSimulation {
   id: number;
-  title: string; // Judul Simulasi (misal: "Latihan Deteksi Email")
+  title: string;
   description: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   items: MockSimulationItem[];
@@ -634,6 +634,164 @@ export const mockSimulations: MockSimulation[] = [
                  <div class="py-2">
                     <a href="http://office-portal-login.net/employee/salary" class="text-blue-600 underline font-medium">
                        Lihat Dokumen (PDF)
+                    </a>
+                 </div>
+              </div>
+           </div>
+        `,
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: 'Simulasi: Spear Phishing & CEO Fraud',
+    description:
+      'Uji kewaspadaanmu terhadap serangan yang menargetkan identitas dan pekerjaanmu secara spesifik.',
+    difficulty: 'Hard',
+    items: [
+      // --- SKENARIO 1: CEO FRAUD (Urgent Transfer) ---
+      {
+        id: 101, // ID unik
+        simulationId: 2,
+        scenarioTitle: 'Pesan Mendesak dari CEO',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Ini adalah "CEO Fraud". Meskipun nama pengirimnya CEO Anda ("Budi Santoso"), lihat alamat emailnya: "ceo-corporates@gmail.com" (menggunakan email publik, bukan email kantor). Penipu menciptakan urgensi agar Anda tidak sempat memverifikasi.',
+        htmlContent: `
+           <div class="flex flex-col gap-3 font-sans text-gray-800">
+              <div class="border-b border-gray-200 pb-2">
+                 <div class="flex justify-between items-baseline">
+                    <p class="font-bold text-lg">Budi Santoso (CEO)</p>
+                    <span class="text-xs text-gray-400">10:45 AM</span>
+                 </div>
+                 <p class="text-xs text-gray-500">&lt;budi.ceo-corporates@gmail.com&gt;</p>
+                 <p class="text-xs text-gray-400">To: Andi (Finance Staff)</p>
+              </div>
+              
+              <div class="text-sm space-y-3 mt-2">
+                 <p>Hai Andi,</p>
+                 <p>Saya sedang meeting penting dengan klien dan tidak bisa terima telepon. Saya butuh bantuan kamu untuk proses transfer pembayaran vendor yang tertunda <strong>SEKARANG JUGA</strong>.</p>
+                 <p>Tolong segera proses invoice terlampir ke rekening BCA a.n. PT Vendor Global. Nanti saya approve formalitasnya setelah meeting.</p>
+                 
+                 <div class="p-3 bg-gray-100 rounded border border-gray-300 flex items-center gap-3 cursor-pointer">
+                    <div class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">PDF</div>
+                    <div>
+                       <p class="font-bold text-sm">Invoice_Urgent_882.pdf</p>
+                       <a href="http://malicious-download-site.com/invoice.exe" class="text-xs text-blue-600 underline">Unduh Dokumen</a>
+                    </div>
+                 </div>
+
+                 <p>Kabari saya kalau sudah ditransfer.</p>
+                 <p class="text-xs text-gray-500">Sent from my iPhone</p>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 2: FAKE SHARED DOCUMENT (Dropbox Palsu) ---
+      {
+        id: 102,
+        simulationId: 2,
+        scenarioTitle: 'Dokumen Proyek Bersama',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Rekan kerja Anda mungkin namanya benar, tapi perhatikan linknya. Link mengarah ke "dropbox-secure-share.net" (palsu), bukan "dropbox.com". Ini teknik untuk mencuri password email kantor Anda.',
+        htmlContent: `
+           <div class="flex flex-col h-full gap-4 font-sans text-gray-800">
+              <div class="flex items-center gap-3 border-b pb-3">
+                 <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">DS</div>
+                 <div class="text-sm">
+                    <p class="font-bold">Dina Sales <span class="font-normal text-gray-500">via Dropbox</span></p>
+                    <p class="text-xs text-gray-400">&lt;no-reply@dropbox-notifications-service.com&gt;</p>
+                 </div>
+              </div>
+
+              <div class="bg-gray-50 p-6 text-center border rounded-lg">
+                 <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Dropbox_Icon.svg" class="w-12 h-12 mx-auto mb-3" alt="Dropbox">
+                 <p class="font-bold mb-2">Dina membagikan file "Laporan_Q4_Final.xlsx" dengan Anda</p>
+                 <p class="text-xs text-gray-500 mb-6">"Tolong dicek untuk presentasi besok ya, Andi."</p>
+                 
+                 <a href="http://dropbox-secure-share.net/login" class="bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700">
+                    Lihat File
+                 </a>
+              </div>
+              <p class="text-[10px] text-gray-400 text-center">Dropbox Inc.</p>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 3: REAL MEETING INVITE (Aman) ---
+      {
+        id: 103,
+        simulationId: 2,
+        scenarioTitle: 'Undangan Meeting Project',
+        isPhishing: false,
+        explanation:
+          'Aman. Ini adalah undangan kalender standar. Email pengirim sesuai dengan domain kantor (@kantor-kita.co.id) dan link meeting mengarah ke domain resmi Zoom (zoom.us) tanpa redirect aneh.',
+        htmlContent: `
+           <div class="flex flex-col gap-3 font-sans text-gray-800">
+              <div class="border-l-4 border-blue-500 pl-3 py-1 bg-blue-50">
+                 <h2 class="font-bold text-lg">Weekly Sync: Project Alpha</h2>
+                 <p class="text-sm text-gray-600">Kamis, 24 Okt • 10:00 – 11:00</p>
+              </div>
+
+              <div class="text-xs text-gray-500 border-b pb-2 mt-2">
+                 <p>Organizer: <strong>Rina Project Mgr</strong> &lt;rina@kantor-kita.co.id&gt;</p>
+              </div>
+
+              <div class="text-sm space-y-3 mt-2">
+                 <p>Halo Tim,</p>
+                 <p>Berikut link untuk meeting mingguan kita.</p>
+                 
+                 <div class="p-3 border rounded-lg">
+                    <p class="font-bold text-xs text-gray-500 uppercase mb-1">Join Zoom Meeting</p>
+                    <a href="https://zoom.us/j/99812381" class="text-blue-600 underline font-medium break-all">
+                       https://zoom.us/j/99812381
+                    </a>
+                 </div>
+              </div>
+              
+              <div class="flex gap-2 mt-2">
+                 <button class="flex-1 border border-gray-300 rounded py-1 text-xs font-bold text-gray-600">Yes</button>
+                 <button class="flex-1 border border-gray-300 rounded py-1 text-xs font-bold text-gray-600">Maybe</button>
+                 <button class="flex-1 border border-gray-300 rounded py-1 text-xs font-bold text-gray-600">No</button>
+              </div>
+           </div>
+        `,
+      },
+
+      // --- SKENARIO 4: FAKE IT SUPPORT (Password Reset) ---
+      {
+        id: 104,
+        simulationId: 2,
+        scenarioTitle: 'Wajib: Reset Password Kantor',
+        isPhishing: true,
+        explanation:
+          'Bahaya! Spear phishing klasik. Email terlihat dari IT Support, tapi perhatikan linknya: "it-support-portal.net" (domain eksternal). Tim IT internal biasanya mengarahkan ke intranet perusahaan atau portal SSO resmi, bukan website pihak ketiga.',
+        htmlContent: `
+           <div class="flex flex-col gap-4 font-sans text-gray-800">
+              <div class="bg-gray-800 text-white p-3 rounded-t-lg flex items-center gap-2 -mx-2 -mt-2">
+                 <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                 <p class="font-bold text-sm">IT SERVICE DESK</p>
+              </div>
+              
+              <div class="text-sm">
+                 <p class="font-bold">Penting: Kebijakan Password Baru</p>
+                 <p class="text-xs text-gray-500 mt-1">From: IT Support &lt;helpdesk@it-support-portal.net&gt;</p>
+              </div>
+
+              <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm">
+                 <p><strong>Password Anda akan kadaluarsa dalam 24 jam.</strong></p>
+              </div>
+
+              <div class="text-sm space-y-2">
+                 <p>Halo Andi,</p>
+                 <p>Sesuai kebijakan keamanan Q4, seluruh karyawan divisi Finance wajib melakukan reset password hari ini.</p>
+                 <p>Gunakan portal di bawah ini agar akses email Anda tidak terkunci besok pagi.</p>
+                 
+                 <div class="py-2 text-center">
+                    <a href="http://kantor-kita-login.net/reset" class="bg-green-600 text-white px-6 py-2 rounded font-bold hover:bg-green-700">
+                       Reset Password Sekarang
                     </a>
                  </div>
               </div>

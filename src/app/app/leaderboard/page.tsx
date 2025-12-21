@@ -4,113 +4,27 @@ import { Trophy, Medal, Crown, TrendingUp, Flame, Target } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { useUserData } from '@/app/api/Auth/services';
 import { Card } from '@/lib/components/Card';
 import { cn } from '@/lib/styles/utils';
 
-// Mock data - replace with real API when available
-const mockLeaderboardData = [
-  {
-    id: 1,
-    rank: 1,
-    name: 'Ahmad Zaky',
-    avatar: '👨‍💻',
-    points: 2850,
-    streak: 45,
-    flashcardsCompleted: 156,
-    accuracyRate: 94,
-  },
-  {
-    id: 2,
-    rank: 2,
-    name: 'Siti Nurhaliza',
-    avatar: '👩‍🎓',
-    points: 2640,
-    streak: 38,
-    flashcardsCompleted: 142,
-    accuracyRate: 92,
-  },
-  {
-    id: 3,
-    rank: 3,
-    name: 'Budi Santoso',
-    avatar: '👨‍🎓',
-    points: 2420,
-    streak: 32,
-    flashcardsCompleted: 128,
-    accuracyRate: 89,
-  },
-  {
-    id: 4,
-    rank: 4,
-    name: 'Rina Melati',
-    avatar: '👩‍💼',
-    points: 2180,
-    streak: 28,
-    flashcardsCompleted: 115,
-    accuracyRate: 88,
-  },
-  {
-    id: 5,
-    rank: 5,
-    name: 'Andi Wijaya',
-    avatar: '👨‍🔬',
-    points: 1950,
-    streak: 24,
-    flashcardsCompleted: 98,
-    accuracyRate: 86,
-  },
-  {
-    id: 6,
-    rank: 6,
-    name: 'Dewi Lestari',
-    avatar: '👩‍🏫',
-    points: 1820,
-    streak: 21,
-    flashcardsCompleted: 89,
-    accuracyRate: 85,
-  },
-  {
-    id: 7,
-    rank: 7,
-    name: 'Reza Pahlevi',
-    avatar: '👨‍💼',
-    points: 1650,
-    streak: 18,
-    flashcardsCompleted: 76,
-    accuracyRate: 83,
-  },
-  {
-    id: 8,
-    rank: 8,
-    name: 'Maya Sari',
-    avatar: '👩‍🔬',
-    points: 1480,
-    streak: 15,
-    flashcardsCompleted: 64,
-    accuracyRate: 81,
-  },
-];
+// Import Hook Service Baru
+import {
+  useUserRank,
+  useLeaderboardByEducation,
+} from '@/app/api/Leaderboard/services';
 
 export default function LeaderboardPage() {
-  const user = useUserData();
-  const [timePeriod, setTimePeriod] = useState<'week' | 'month' | 'alltime'>(
-    'week'
-  );
+  // State Filter Education Level (Default: Undergraduate sesuai contoh API)
+  const [educationLevel, setEducationLevel] = useState<string>('Undergraduate');
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Crown className="h-8 w-8 text-yellow-500" />;
-      case 2:
-        return <Medal className="h-8 w-8 text-gray-400" />;
-      case 3:
-        return <Medal className="h-8 w-8 text-amber-700" />;
-      default:
-        return <div className="text-2xl font-bold text-gray-500">#{rank}</div>;
-    }
-  };
+  // 1. Fetch Data User Rank (Posisi saya)
+  const { data: userRankResponse, isLoading: isUserLoading } = useUserRank();
 
+  // 2. Fetch Data Leaderboard List (Top Users)
+  const { data: leaderboardResponse, isLoading: isListLoading } =
+    useLeaderboardByEducation(educationLevel);
+
+  // --- Helpers ---
   const getRankBgColor = (rank: number) => {
     switch (rank) {
       case 1:
@@ -124,16 +38,33 @@ export default function LeaderboardPage() {
     }
   };
 
-  const currentUserRank = 15;
-  const currentUserData = {
-    rank: currentUserRank,
-    name: user?.nama || 'User',
-    avatar: '😊',
-    points: 1250,
-    streak: 12,
-    flashcardsCompleted: 52,
-    accuracyRate: 78,
+  // Helper avatar generator sederhana (Inisial Nama)
+  const getAvatar = (name: string) => {
+    // List emoji random biar variatif
+    const emojis = ['👨‍💻', '👩‍🎓', '👨‍🎓', '👩‍💼', '👨‍🔬', '👩‍🏫', '🚀', '🔥'];
+    // Pilih emoji berdasarkan panjang nama agar konsisten
+    return emojis[name.length % emojis.length];
   };
+
+  // --- Data Processing ---
+  const currentUser = userRankResponse?.data;
+  const leaderboardData = leaderboardResponse?.data || [];
+
+  // Top 3 Users (untuk Podium)
+  const top1 = leaderboardData.find((u) => u.rank === 1);
+  const top2 = leaderboardData.find((u) => u.rank === 2);
+  const top3 = leaderboardData.find((u) => u.rank === 3);
+
+  // Sisanya (List ke bawah)
+  const restOfList = leaderboardData.filter((u) => u.rank > 3);
+
+  if (isUserLoading || isListLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-purple-50">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-purple-600 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-24 md:pb-8">
@@ -159,7 +90,8 @@ export default function LeaderboardPage() {
                 Leaderboard
               </h1>
               <p className="text-purple-100">
-                Lihat ranking pengguna terbaik di Scam Aware! 🏆
+                Lihat ranking streak tertinggi berdasarkan jenjang pendidikan!
+                🏆
               </p>
             </div>
           </div>
@@ -167,203 +99,205 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="mx-auto max-w-4xl px-6 py-8 md:px-8">
-        {/* Time Period Filter */}
-        <div className="mb-6 flex justify-center gap-2 rounded-xl bg-white p-2 shadow-lg">
-          <button
-            onClick={() => setTimePeriod('week')}
-            className={cn(
-              'flex-1 rounded-lg px-4 py-2 font-semibold transition-all',
-              timePeriod === 'week'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            )}
-          >
-            Minggu Ini
-          </button>
-          <button
-            onClick={() => setTimePeriod('month')}
-            className={cn(
-              'flex-1 rounded-lg px-4 py-2 font-semibold transition-all',
-              timePeriod === 'month'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            )}
-          >
-            Bulan Ini
-          </button>
-          <button
-            onClick={() => setTimePeriod('alltime')}
-            className={cn(
-              'flex-1 rounded-lg px-4 py-2 font-semibold transition-all',
-              timePeriod === 'alltime'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            )}
-          >
-            Sepanjang Waktu
-          </button>
+        {/* Education Level Filter */}
+        <div className="mb-6 flex gap-2 overflow-x-auto rounded-xl bg-white p-2 shadow-lg scrollbar-hide">
+          {['Undergraduate'].map((level) => (
+            <button
+              key={level}
+              onClick={() => setEducationLevel(level)}
+              className={cn(
+                'flex-1 whitespace-nowrap rounded-lg px-4 py-2 font-semibold transition-all',
+                educationLevel === level
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              )}
+            >
+              {level}
+            </button>
+          ))}
         </div>
 
-        {/* Current User Card */}
-        <Card className="mb-6 overflow-hidden border-4 border-purple-200 p-0 shadow-xl">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-600 px-4 py-3 text-white">
-            <p className="font-semibold">Ranking Kamu</p>
-          </div>
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-2xl">
-                {currentUserData.avatar}
+        {/* Current User Card (Posisi Saya) */}
+        {currentUser && (
+          <Card className="mb-6 overflow-hidden border-4 border-purple-200 p-0 shadow-xl">
+            <div className="bg-gradient-to-r from-purple-500 to-pink-600 px-4 py-3 text-white">
+              <p className="font-semibold">Posisi Kamu Saat Ini</p>
+            </div>
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-purple-300 bg-purple-100 text-2xl">
+                  {getAvatar(currentUser.userName)}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">
+                    {currentUser.userName}{' '}
+                    <span className="text-xs font-normal text-gray-500">
+                      ({currentUser.educationLevel})
+                    </span>
+                  </p>
+                  <p className="text-sm font-bold text-purple-600">
+                    Peringkat #{currentUser.rank}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-gray-800">
-                  {currentUserData.name}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Peringkat #{currentUserData.rank}
-                </p>
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-1 text-2xl font-bold text-orange-500">
+                  <Flame className="h-6 w-6 fill-orange-500" />
+                  {currentUser.activeStreak}
+                </div>
+                <p className="text-xs text-gray-500">Active Streak</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-purple-600">
-                {currentUserData.points}
-              </p>
-              <p className="text-sm text-gray-500">poin</p>
+          </Card>
+        )}
+
+        {/* Top 3 Podium (Hanya tampil jika ada data) */}
+        {leaderboardData.length > 0 && (
+          <div className="mb-8 grid grid-cols-3 items-end gap-2 sm:gap-4">
+            {/* 2nd Place */}
+            <div className="text-center">
+              {top2 ? (
+                <>
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-gray-300 to-gray-500 text-3xl shadow-lg ring-4 ring-gray-200 sm:h-16 sm:w-16">
+                    {getAvatar(top2.userName)}
+                  </div>
+                  <div className="rounded-t-xl bg-gradient-to-br from-gray-200 to-gray-400 px-2 py-4 shadow-lg sm:py-6">
+                    <Medal className="mx-auto mb-2 h-6 w-6 text-white sm:h-8 sm:w-8" />
+                    <p className="mb-1 line-clamp-1 text-xs font-bold text-gray-800 sm:text-sm">
+                      {top2.userName}
+                    </p>
+                    <p className="text-lg font-extrabold text-white sm:text-xl">
+                      {top2.activeStreak}{' '}
+                      <span className="text-xs font-normal">🔥</span>
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="h-24"></div>
+              )}
+            </div>
+
+            {/* 1st Place */}
+            <div className="text-center">
+              {top1 ? (
+                <>
+                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-4xl shadow-xl ring-4 ring-yellow-200 sm:h-20 sm:w-20">
+                    <Crown className="absolute -top-6 h-8 w-8 animate-bounce fill-yellow-200 text-yellow-500" />
+                    {getAvatar(top1.userName)}
+                  </div>
+                  <div className="relative z-10 rounded-t-xl bg-gradient-to-br from-yellow-400 to-yellow-600 px-2 py-6 shadow-xl sm:py-8">
+                    <Crown className="mx-auto mb-2 h-8 w-8 text-white sm:h-10 sm:w-10" />
+                    <p className="mb-1 line-clamp-1 text-sm font-bold text-gray-900 sm:text-base">
+                      {top1.userName}
+                    </p>
+                    <p className="text-2xl font-extrabold text-white sm:text-3xl">
+                      {top1.activeStreak}{' '}
+                      <span className="text-sm font-normal">🔥</span>
+                    </p>
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            {/* 3rd Place */}
+            <div className="text-center">
+              {top3 ? (
+                <>
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-3xl shadow-lg ring-4 ring-amber-200 sm:h-16 sm:w-16">
+                    {getAvatar(top3.userName)}
+                  </div>
+                  <div className="rounded-t-xl bg-gradient-to-br from-amber-600 to-amber-800 px-2 py-4 shadow-lg sm:py-6">
+                    <Medal className="mx-auto mb-2 h-6 w-6 text-white sm:h-8 sm:w-8" />
+                    <p className="mb-1 line-clamp-1 text-xs font-bold text-gray-100 sm:text-sm">
+                      {top3.userName}
+                    </p>
+                    <p className="text-lg font-extrabold text-white sm:text-xl">
+                      {top3.activeStreak}{' '}
+                      <span className="text-xs font-normal">🔥</span>
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="h-24"></div>
+              )}
             </div>
           </div>
-        </Card>
+        )}
 
-        {/* Top 3 Podium */}
-        <div className="mb-8 grid grid-cols-3 items-end gap-4">
-          {/* 2nd Place */}
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-300 to-gray-500 text-3xl shadow-lg">
-              {mockLeaderboardData[1].avatar}
-            </div>
-            <div className="rounded-t-xl bg-gradient-to-br from-gray-200 to-gray-400 px-3 py-6 shadow-lg">
-              <Medal className="mx-auto mb-2 h-8 w-8 text-white" />
-              <p className="mb-1 text-sm font-bold text-gray-800">
-                {mockLeaderboardData[1].name.split(' ')[0]}
-              </p>
-              <p className="text-xl font-extrabold text-white">
-                {mockLeaderboardData[1].points}
-              </p>
-              <p className="text-xs text-gray-700">poin</p>
-            </div>
-          </div>
-
-          {/* 1st Place */}
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-4xl shadow-xl ring-4 ring-yellow-200">
-              {mockLeaderboardData[0].avatar}
-            </div>
-            <div className="rounded-t-xl bg-gradient-to-br from-yellow-400 to-yellow-600 px-3 py-8 shadow-xl">
-              <Crown className="mx-auto mb-2 h-10 w-10 text-white" />
-              <p className="mb-1 text-base font-bold text-gray-800">
-                {mockLeaderboardData[0].name.split(' ')[0]}
-              </p>
-              <p className="text-2xl font-extrabold text-white">
-                {mockLeaderboardData[0].points}
-              </p>
-              <p className="text-xs text-gray-700">poin</p>
-            </div>
-          </div>
-
-          {/* 3rd Place */}
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-3xl shadow-lg">
-              {mockLeaderboardData[2].avatar}
-            </div>
-            <div className="rounded-t-xl bg-gradient-to-br from-amber-600 to-amber-800 px-3 py-6 shadow-lg">
-              <Medal className="mx-auto mb-2 h-8 w-8 text-white" />
-              <p className="mb-1 text-sm font-bold text-gray-100">
-                {mockLeaderboardData[2].name.split(' ')[0]}
-              </p>
-              <p className="text-xl font-extrabold text-white">
-                {mockLeaderboardData[2].points}
-              </p>
-              <p className="text-xs text-gray-200">poin</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Rankings List */}
+        {/* Rankings List (Posisi 4 ke bawah) */}
         <div className="space-y-3">
-          {mockLeaderboardData.slice(3).map((player, index) => (
+          {restOfList.map((player) => (
             <Card
-              key={player.id}
+              key={player.userId}
               className="hover:scale-102 transform overflow-hidden p-0 transition-all hover:shadow-xl"
             >
               <div className="flex items-center gap-4 p-4">
                 <div
                   className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-lg',
+                    'flex h-10 w-10 items-center justify-center rounded-lg shadow-sm sm:h-12 sm:w-12',
                     getRankBgColor(player.rank)
                   )}
                 >
-                  <span className="text-xl font-extrabold text-white">
+                  <span className="text-lg font-extrabold text-white sm:text-xl">
                     {player.rank}
                   </span>
                 </div>
 
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-2xl">
-                  {player.avatar}
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-xl sm:h-12 sm:w-12 sm:text-2xl">
+                  {getAvatar(player.userName)}
                 </div>
 
                 <div className="flex-grow">
-                  <p className="font-bold text-gray-800">{player.name}</p>
+                  <p className="line-clamp-1 font-bold text-gray-800">
+                    {player.userName}
+                  </p>
                   <div className="flex gap-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
-                      <Flame className="h-3 w-3 text-orange-500" />
-                      {player.streak}d
-                    </span>
-                    <span className="flex items-center gap-1">
                       <Target className="h-3 w-3 text-blue-500" />
-                      {player.flashcardsCompleted}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3 text-green-500" />
-                      {player.accuracyRate}%
+                      Longest: {player.longestStreak}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-xl font-bold text-purple-600">
-                    {player.points}
+                  <p className="flex items-center justify-end gap-1 text-lg font-bold text-orange-500 sm:text-xl">
+                    <Flame className="h-4 w-4 fill-orange-500" />
+                    {player.activeStreak}
                   </p>
-                  <p className="text-xs text-gray-500">poin</p>
+                  <p className="text-xs text-gray-500">streak</p>
                 </div>
               </div>
             </Card>
           ))}
+
+          {leaderboardData.length === 0 && (
+            <div className="py-10 text-center text-gray-500">
+              Belum ada data leaderboard untuk kategori ini.
+            </div>
+          )}
         </div>
 
         {/* Info Box */}
         <Card className="mt-8 border-2 border-blue-200 bg-blue-50 p-6">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-blue-900">
             <TrendingUp className="h-5 w-5" />
-            Cara Mendapat Poin
+            Sistem Peringkat
           </h3>
           <ul className="space-y-2 text-sm text-blue-800">
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
               <span>
-                <strong>Selesaikan Quiz:</strong> Dapatkan poin berdasarkan
-                akurasi jawaban kamu
+                <strong>Ranking berdasarkan Active Streak:</strong> Semakin lama
+                kamu mempertahankan streak harianmu, semakin tinggi posisi kamu
+                di leaderboard.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-600">•</span>
               <span>
-                <strong>Jaga Streak:</strong> Bonus poin untuk belajar konsisten
-                setiap hari
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-600">•</span>
-              <span>
-                <strong>Selesaikan Flashcard:</strong> Setiap flashcard yang
-                diselesaikan menambah poin
+                <strong>Kategori Pendidikan:</strong> Kamu bersaing dengan
+                pengguna lain yang berada di jenjang pendidikan yang sama (
+                {educationLevel}).
               </span>
             </li>
           </ul>

@@ -236,12 +236,20 @@ export default function QuizInteractivePage() {
     } else {
       // --- KARTU TERAKHIR SELESAI ---
       try {
-        // HITUNG SKOR FINAL SECARA MANUAL
-        // Kita pakai 'newAnswers' karena state 'answers' mungkin belum update
+        // --- TAMBAHAN: HITUNG & SIMPAN SKOR KE LOCAL STORAGE ---
         const finalCorrectCount = Array.from(newAnswers.values()).filter(
           Boolean
         ).length;
         const totalQuestions = simulationItems.length;
+
+        // Simpan ke storage biar bisa dibaca di halaman Result/Pembahasan
+        localStorage.setItem(
+          'latest_quiz_score',
+          JSON.stringify({
+            correct: finalCorrectCount,
+            total: totalQuestions,
+          })
+        );
 
         // Panggil finishPlay dengan parameter lengkap
         await finishQuiz(playId, totalQuestions, finalCorrectCount);

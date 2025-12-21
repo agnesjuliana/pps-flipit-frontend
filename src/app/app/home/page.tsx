@@ -7,6 +7,7 @@
 import { Book, Copy, Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import type {
   CreatePlayResponseType,
@@ -14,14 +15,16 @@ import type {
 } from '@/app/api/Play/model';
 import { useCreatePlay } from '@/app/api/Play/service';
 import { useUserData } from '@/app/api/Auth/services';
-import { useEffect, useState } from 'react';
+// Import Hook Streak
+import { useWeeklyStreakV2, useCurrentStreak } from '@/app/api/Streak/services';
+
 import { getAllFlashcards, getAllFolders } from '@/lib/data/mockData';
 import { cn } from '@/lib/styles/utils';
 import Mascot from '@/lib/assets/home-asset-1.svg';
 import Fire from '@/lib/assets/fire.svg';
 import { Card } from '@/lib/components/Card';
 
-// --- KOMPONEN DIPINDAHKAN KELUAR (Best Practice) ---
+// --- KOMPONEN EXTERNAL ---
 
 const StreakIndicator = ({
   day,
@@ -38,7 +41,7 @@ const StreakIndicator = ({
       {isStreak ? (
         <Fire
           style={{ width: '20px', height: '20px' }}
-          className="sm:h-[26px] sm:w-[26px]"
+          className="text-orange-500 sm:h-[26px] sm:w-[26px]"
         />
       ) : (
         <div className="h-5 w-5 rounded-full bg-gray-300 sm:h-[26px] sm:w-[26px]" />
@@ -74,25 +77,50 @@ const Page = () => {
   const router = useRouter();
   const userData = useUserData();
   const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Use mock data
+  // --- INTEGRASI DATA STREAK ---
+
+  // 1. Fetch Data
+  const { data: weeklyResponse } = useWeeklyStreakV2();
+  const { data: currentStreakResponse } = useCurrentStreak();
+
+  // 2. Mapping Data Streak Mingguan
+  // Kita sesuaikan keyDay dengan format API ('Sun', 'Mon', dst) agar matching mudah
+  const winStreakData = [
+    { keyDay: 'Mon', day: 'Sen', isStreak: false },
+    { keyDay: 'Tue', day: 'Sel', isStreak: false },
+    { keyDay: 'Wed', day: 'Rab', isStreak: false },
+    { keyDay: 'Thu', day: 'Kam', isStreak: false },
+    { keyDay: 'Fri', day: 'Jum', isStreak: false },
+    { keyDay: 'Sat', day: 'Sab', isStreak: false },
+    { keyDay: 'Sun', day: 'Min', isStreak: false },
+  ];
+
+  const weeklyData = weeklyResponse?.data?.weekData || [];
+
+  if (Array.isArray(weeklyData)) {
+    weeklyData.forEach((item: { day: string; attempts: number }) => {
+      const index = winStreakData.findIndex((d) => d.keyDay === item.day);
+      if (index !== -1) {
+        winStreakData[index].isStreak = item.attempts > 0;
+      }
+    });
+  }
+
+  // 3. Ambil Angka Streak Saat Ini
+  const currentStreakCount = currentStreakResponse?.data?.streakCount ?? 0;
+
+  // --- END INTEGRASI ---
+
+  // Use mock data for content
   const folderListData = getAllFolders();
   const flashcardListData = getAllFlashcards();
 
   const { mutate } = useCreatePlay();
-
-  const winStreakData = [
-    { keyDay: 'Monday', day: 'Sen', isStreak: false },
-    { keyDay: 'Tuesday', day: 'Sel', isStreak: false },
-    { keyDay: 'Wednesday', day: 'Rab', isStreak: false },
-    { keyDay: 'Thursday', day: 'Kam', isStreak: false },
-    { keyDay: 'Friday', day: 'Jum', isStreak: false },
-    { keyDay: 'Saturday', day: 'Sab', isStreak: false },
-    { keyDay: 'Sunday', day: 'Min', isStreak: false },
-  ];
 
   const handleFlashcardClick = async (flashcardId: number) => {
     const payload: CreatePlayType = {
@@ -108,59 +136,6 @@ const Page = () => {
   const handleFolderClick = async (folderId: number, folderTitle: string) => {
     const path = folderTitle.replace(/\s/g, '-');
     router.push(`/app/folder/${folderId}/${path}`);
-  };
-
-  const FlashCardRecently = ({
-    title,
-    subtitle,
-    flashcardId,
-  }: {
-    title: string;
-    subtitle: string;
-    flashcardId: number;
-  }) => {
-    return (
-      <button
-        className="flex-shrink-0 text-left"
-        type="button"
-        aria-label="flashcard-button"
-        onClick={() => handleFlashcardClick(flashcardId)}
-      >
-        <Card className="w-40 border-[#E4E4E7] sm:w-48 md:w-56">
-          <div className="flex flex-col gap-1">
-            <p className="line-clamp-2 text-xs font-bold sm:text-sm">{title}</p>
-            <p className="line-clamp-1 text-xs text-gray-500">{subtitle}</p>
-          </div>
-        </Card>
-      </button>
-    );
-  };
-
-  const ClassFolderCard = ({
-    title,
-    subtitle,
-    folderId,
-  }: {
-    title: string;
-    subtitle: string;
-    folderId: number;
-  }) => {
-    return (
-      <button
-        className="flex-shrink-0 text-left"
-        type="button"
-        aria-label="folder-button"
-        onClick={() => handleFolderClick(folderId, title)}
-      >
-        <Card className="w-40 border-[#E4E4E7] bg-[#F9FAFB] sm:w-48 md:w-56">
-          <div className="flex flex-col gap-1">
-            <p className="text-2xl sm:text-3xl md:text-4xl">📁</p>
-            <p className="line-clamp-2 text-xs font-bold sm:text-sm">{title}</p>
-            <p className="line-clamp-1 text-xs text-gray-500">{subtitle}</p>
-          </div>
-        </Card>
-      </button>
-    );
   };
 
   return (
@@ -179,7 +154,8 @@ const Page = () => {
               <div className="flex items-center gap-2">
                 <Flame className="h-5 w-5 text-orange-500 sm:h-6 sm:w-6" />
                 <p className="text-sm font-semibold text-gray-800 sm:text-base">
-                  {0}
+                  {/* Tampilkan Current Streak Disini */}
+                  {currentStreakCount}
                 </p>
               </div>
             </div>
@@ -206,6 +182,7 @@ const Page = () => {
             </p>
             <Mascot className="h-20 w-auto sm:h-24 md:h-28" />
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4">
+              {/* Render Grafik Streak Mingguan */}
               {winStreakData?.map((item, i) => (
                 <StreakIndicator
                   key={i as number}

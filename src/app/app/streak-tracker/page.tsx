@@ -58,7 +58,9 @@ export default function StreakTrackerPage() {
     'Jumat',
     'Sabtu',
   ];
-  const selectedDays = selectedDates.map((date) => hariIndo[date.getDay()]);
+  const selectedDays = selectedDates.map(
+    (date: Date) => hariIndo[date.getDay()]
+  );
 
   // B. Today's Stats
   // Menggunakan new Date() local untuk mencocokkan tanggal hari ini
@@ -277,7 +279,7 @@ export default function StreakTrackerPage() {
                 Hari dari tanggal streak (+1):
               </h4>
               <div className="flex flex-wrap justify-center gap-2">
-                {selectedDates.map((date, idx) => (
+                {selectedDates.map((date: Date, idx: number) => (
                   <div
                     key={idx}
                     className="rounded bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-800"

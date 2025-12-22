@@ -34,9 +34,11 @@ export default function ActivityPage() {
   }, [monthlyStreakData]);
 
   return (
-    <section className="relative flex flex-col">
-      <Image src="/assets/app/head.png" width={646} height={146} />
-      <div className="flex flex-col p-5">
+    <section className="relative flex min-h-screen flex-col items-center justify-center">
+      {/* Quarter Circles - All screen sizes */}
+      <div className="absolute left-0 top-0 aspect-square h-56 -translate-x-1/2 -translate-y-1/2 rounded-br-full bg-[#FEC536] md:h-[500px]" />
+      <div className="absolute right-0 top-0 aspect-square h-56 -translate-y-1/2 translate-x-1/2 rounded-bl-full bg-[#FEC536] md:h-[500px]" />
+      <div className="flex w-full max-w-xl flex-col p-5">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Aktivitas</h1>
           <Link href="/">

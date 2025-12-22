@@ -1,11 +1,33 @@
 /* eslint-disable no-console */
-import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-
+import { useMutation } from '@tanstack/react-query';
 import login from './action';
 import type { CreateUserType, LoginUserType } from './model';
 
 const baseUrl = process.env.BASE_URL;
+
+export const updateProfile = async ({
+  name,
+  educationLevel,
+}: {
+  name: string;
+  educationLevel: string;
+}) => {
+  const token =
+    typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  if (!token) throw new Error('Token tidak ditemukan');
+  const response = await axios.put(
+    `${baseUrl}/auth/profile`,
+    { name, educationLevel },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response.data;
+};
 
 const registration = async (
   credentials: Omit<CreateUserType, 'confirm_password'>

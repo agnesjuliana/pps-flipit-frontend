@@ -96,7 +96,7 @@ export default function ActivityPage() {
           <Link href="/">
             <FaShareAlt className="text-lg text-[#6699CC] sm:text-xl" />
           </Link>
-          <Link href="/">
+          <Link href="/app/profile/edit-profile">
             <LuPencil className="text-lg sm:text-2xl" />
           </Link>
         </div>

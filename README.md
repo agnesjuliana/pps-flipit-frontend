@@ -1,64 +1,145 @@
-<img src="https://og.sznm.dev/api/generate?heading=nextarter-tailwind&text=Next.js+(App+Router)+template+with+TailwindCSS+and+TypeScript+setup.&template=color&center=true&height=320" />
+# FlipIt - Flashcard Learning Application
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/sozonome/nextarter-tailwind) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/sozonome/nextarter-tailwind)
+A modern web-based flashcard application built with Next.js that helps users study and learn effectively through interactive flashcards, folders, quizzes, and streak tracking.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/sozonome/nextarter-tailwind)
+## ✨ Features
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), added with [**TailwindCSS**](https://tailwindcss.com) and [**TypeScript**](https://www.typescriptlang.org) setup.
-Start developing right away!
+- 📚 **Create & Manage Flashcards** - Create and organize flashcards into folders
+- 🎯 **Quiz Mode** - Test your knowledge with interactive quizzes
+- 🔥 **Streak Tracking** - Keep track of your daily study streaks
+- 👥 **Leaderboard** - Compete with other users and see global rankings
+- 📊 **Activity Tracking** - Monitor your learning progress and statistics
+- 👤 **User Profiles** - Manage your account and view personal stats
+- 🔐 **Authentication** - Secure login and registration system
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
 
-## 🔋⚡ Super Battery Packed template
+## 🛠️ Tech Stack
 
-- 🚀 **Next.js 13 (App Router)** - **React 18**
-- ⛓️ **TypeScript**
-- **TailwindCSS** v3
-  - recommended to extend with one of these:
-    - [shadcn/ui](https://ui.shadcn.com/)
-    - [tremor](https://www.tremor.so/)
-    - [flowbite-react](https://www.flowbite-react.com/)
-    - [daisyUI](https://daisyui.com/)
-    - [Headless UI](https://headlessui.com/)
-    - [Mantine](https://mantine.dev)
-    - [NextUI v2](https://github.com/nextui-org/nextui/discussions/1035)
-- ✔️ **toolings** for linting, formatting, and conventions configured
-  - `eslint`, `prettier`, `husky`, `lint-staged`, `commitlint`, `commitizen`, and `standard-version`
-  - `pre-commit`, `pre-push`, `commit-msg`, `prepare-commit-msg` hook configured
-- 📱 **PWA-ready** - `next-pwa` configured, enabled by default, just disable it through `next.config.js`
-- 🔎 SEO optimization configured - with `next-seo` and `next-sitemap`.
-  - you'll need to reconfigure or tinker with it to get it right according to your needs, but it's there if you need it.
-- 🎨 basic responsive layout configured - don't need it? just remove it 😃
-- 🤖 **Automatic Dependency Update** with [Renovate](https://renovatebot.com/)
-- 🏎️ **Turbo** setup
+- 🚀 **Next.js 13** (App Router) with React 18
+- ⛓️ **TypeScript** - For type-safe development
+- 🎨 **TailwindCSS** - Modern utility-first CSS framework
+- 🎭 **Material-UI (MUI)** - Component library
+- 📦 **pnpm** - Fast package manager
+- 🏎️ **Turbo** - Monorepo build tool
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sozonome_nextarter-tailwind&metric=alert_status)](https://sonarcloud.io/dashboard?id=sozonome_nextarter-tailwind) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=sozonome_nextarter-tailwind&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=sozonome_nextarter-tailwind) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=sozonome_nextarter-tailwind&metric=bugs)](https://sonarcloud.io/dashboard?id=sozonome_nextarter-tailwind) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=sozonome_nextarter-tailwind&metric=code_smells)](https://sonarcloud.io/dashboard?id=sozonome_nextarter-tailwind) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=sozonome_nextarter-tailwind&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=sozonome_nextarter-tailwind)
+## 📋 Developer Tools
 
-## Getting Started
+- ✅ **ESLint** - Code linting
+- 🎀 **Prettier** - Code formatting
+- 🐕 **Husky** - Git hooks
+- 📝 **CommitLint** - Conventional commits
+- 🔄 **Renovate** - Automated dependency updates
 
-You can either click `Use this template` button on this repository and clone the repo or directly from your terminal:
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18+ 
+- **pnpm** 10.22.0+ (or npm/yarn)
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npx degit sozonome/nextarter-tailwind <APP_NAME>
+git clone <repository-url>
+cd flipit-frontend
 ```
 
-Install packages:
+2. Install dependencies:
 
 ```bash
-pnpm i
+pnpm install
 ```
 
-Then, run the development server:
+### Development
+
+Run the development server:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `src/pages/index.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-## References
+```bash
+pnpm build
+pnpm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [TailwindCSS](https://tailwindcss.com)
-- [TypeScript](https://www.typescriptlang.org)
+### Other Useful Commands
+
+- **Linting & Formatting:**
+  ```bash
+  pnpm lint           # Run ESLint
+  pnpm lint:fix       # Fix linting issues
+  pnpm format         # Format code with Prettier
+  ```
+
+- **Type Checking:**
+  ```bash
+  pnpm type-check     # Check TypeScript types
+  ```
+
+- **Turbo Build:**
+  ```bash
+  pnpm build:turbo    # Build with Turbo for faster builds
+  pnpm check:turbo    # Lint and type-check with Turbo
+  ```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                 # Next.js App Router pages and layouts
+│   ├── api/            # API routes for backend integration
+│   ├── app/            # Main app pages (dashboard)
+│   ├── login/          # Login page
+│   ├── registration/   # Registration page
+│   └── ...
+├── lib/                # Utilities and reusable code
+│   ├── components/     # Reusable React components
+│   ├── layout/         # Layout components
+│   ├── styles/         # Global styles and utilities
+│   └── types/          # TypeScript type definitions
+└── middleware.ts       # Next.js middleware
+```
+
+## 🔗 API Endpoints
+
+The application connects to several API endpoints:
+
+- **Auth** - User authentication and login
+- **Flashcard** - Create, read, update, delete flashcards
+- **Folder** - Manage flashcard folders
+- **Quiz/Play** - Quiz functionality
+- **Streak** - Streak tracking
+- **Leaderboard** - User rankings
+
+## 🎯 Key Pages
+
+- `/` - Home/Dashboard
+- `/login` - User login
+- `/registration` - User registration
+- `/home/create-flashcard` - Create new flashcards
+- `/home/create-folder` - Create new folders
+- `/flashcard/[id]` - View flashcard
+- `/quiz/[id]` - Take a quiz
+- `/folder/[id]` - View folder contents
+- `/leaderboard` - Global rankings
+- `/profile` - User profile
+- `/activity` - Activity history
+- `/streak-tracker` - Streak tracking
+
+## 📚 References
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [TailwindCSS Documentation](https://tailwindcss.com)
+- [TypeScript Documentation](https://www.typescriptlang.org)
+- [Material-UI Documentation](https://mui.com)
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

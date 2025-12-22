@@ -2,22 +2,36 @@
 
 import { Image } from '@nextui-org/react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { RiShareBoxFill } from 'react-icons/ri';
 
 import { Calendar } from '@/app/components/ui/calendar';
-import { useMonthlyStreak } from '@/app/api/Streak/services';
+import {
+  useCurrentStreak,
+  useAllStreaks,
+  useMonthlyStreakV2,
+} from '@/app/api/Streak/services';
 
 export default function ActivityPage() {
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const {
-    data: monthlyStreakData = {
-      streakTotal: 0,
-      todayPlayTotal: 0,
-      flashcardTotal: 0,
-      streakMonth: [],
-    },
-  } = useMonthlyStreak();
+  // Ambil streak harian
+  const { data: currentStreakData, isLoading: isCurrentStreakLoading } =
+    useCurrentStreak();
+  // Ambil data bulanan quiz
+  const { data: monthlyStreakData, isLoading: isMonthlyLoading } =
+    useMonthlyStreakV2();
+
+  // Ambil tanggal yang attempts === 1 dari monthData
+  const fireDates = useMemo(() => {
+    if (!monthlyStreakData?.data?.monthData) return [];
+    return monthlyStreakData.data.monthData
+      .filter((d: any) => d.attempts === 1)
+      .map((d: any) => {
+        const date = new Date(d.date);
+        // Tambah 1 hari
+        date.setDate(date.getDate() + 1);
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      });
+  }, [monthlyStreakData]);
 
   return (
     <section className="relative flex flex-col">
@@ -50,7 +64,7 @@ export default function ActivityPage() {
                   />
                 </svg>
                 <h3 className="text-2xl font-bold">
-                  {monthlyStreakData?.streakTotal}
+                  {currentStreakData?.data?.streakCount ?? 0}
                 </h3>
               </div>
               <p className="text-xs text-[#A1A1AA]">Streak Harian</p>
@@ -71,9 +85,7 @@ export default function ActivityPage() {
                     fill="#72C287"
                   />
                 </svg>
-                <h3 className="text-2xl font-bold">
-                  {monthlyStreakData?.todayPlayTotal}
-                </h3>
+                <h3 className="text-2xl font-bold">0</h3>
               </div>
               <p className="text-xs text-[#A1A1AA]">Repetisi Materi</p>
             </div>
@@ -99,9 +111,7 @@ export default function ActivityPage() {
                     strokeWidth="1.16667"
                   />
                 </svg>
-                <h3 className="text-2xl font-bold">
-                  {monthlyStreakData?.flashcardTotal}
-                </h3>
+                <h3 className="text-2xl font-bold">0</h3>
               </div>
               <p className="text-xs text-[#A1A1AA]">Flash Cards</p>
             </div>
@@ -109,7 +119,9 @@ export default function ActivityPage() {
         </div>
         <Calendar
           mode="multiple"
-          selected={selectedDates}
+          selected={fireDates}
+          modifiers={{ fire: fireDates }}
+          modifiersClassNames={{ fire: 'bg-fire' }}
           className="mt-6 w-full rounded-md border"
         />
         <div className="mt-4 flex justify-center gap-4">

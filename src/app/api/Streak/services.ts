@@ -1,3 +1,17 @@
+// Ambil semua streak user (history streak)
+const fetchAllStreaks = async () => {
+  const response = await axios.get(`${baseUrl}/streak/all`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data;
+};
+
+export const useAllStreaks = () => {
+  return useQuery({
+    queryKey: ['allStreaks'],
+    queryFn: fetchAllStreaks,
+  });
+};
 import { useQuery, type QueryFunctionContext } from '@tanstack/react-query';
 import axios from 'axios';
 

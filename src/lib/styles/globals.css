@@ -1,3 +1,10 @@
+/* Untuk background api pada tanggal streak di kalender */
+.bg-fire {
+  background-image: url('/assets/app/fire.png');
+  background-size: 28px 28px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

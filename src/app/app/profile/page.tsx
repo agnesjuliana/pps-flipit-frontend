@@ -4,7 +4,7 @@ import { Image } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaShareAlt } from 'react-icons/fa';
-import { LuMoveVertical } from 'react-icons/lu';
+import { LuPencil } from 'react-icons/lu';
 // import { PiPencilSimpleLineBold } from 'react-icons/pi';
 
 import { useUserData } from '@/app/api/Auth/services';
@@ -97,7 +97,7 @@ export default function ActivityPage() {
             <FaShareAlt className="text-lg text-[#6699CC] sm:text-xl" />
           </Link>
           <Link href="/">
-            <LuMoveVertical className="text-lg sm:text-2xl" />
+            <LuPencil className="text-lg sm:text-2xl" />
           </Link>
         </div>
         <div className="flex flex-col items-center gap-2 py-4 sm:py-6">

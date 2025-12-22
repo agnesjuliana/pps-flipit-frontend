@@ -39,11 +39,26 @@ export default function StreakTrackerPage() {
   const monthlyData = monthlyResponse?.data?.monthData || [];
   const totalCorrectMonth = monthlyResponse?.data?.totalCorrect || 0;
 
-  // [OPTIMASI] Hitung selectedDates langsung disini (Derived State)
-  // Tidak perlu useEffect, data akan otomatis ter-update saat monthlyData berubah
+  // Hitung selectedDates dan selectedDays (+1 hari)
   const selectedDates = monthlyData
     .filter((d: any) => d.attempts > 0)
-    .map((d: any) => new Date(d.date));
+    .map((d: any) => {
+      const date = new Date(d.date);
+      date.setDate(date.getDate() + 1);
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    });
+
+  // Ambil hari dari tanggal yang sudah +1
+  const hariIndo = [
+    'Minggu',
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+  ];
+  const selectedDays = selectedDates.map((date) => hariIndo[date.getDay()]);
 
   // B. Today's Stats
   // Menggunakan new Date() local untuk mencocokkan tanggal hari ini
@@ -53,6 +68,7 @@ export default function StreakTrackerPage() {
   const todayPlays = todayStats?.attempts || 0;
 
   // C. Weekly Data Mapping
+  const hariMinggu = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
   const winStreakData = [
     { keyDay: 'Sun', day: 'Min', isStreak: false },
     { keyDay: 'Mon', day: 'Sen', isStreak: false },
@@ -208,35 +224,40 @@ export default function StreakTrackerPage() {
           </div>
           <div className="p-6">
             <div className="flex justify-around">
-              {winStreakData.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center gap-2 transition-transform hover:scale-110"
-                >
-                  <span className="text-sm font-semibold text-gray-600">
-                    {item.day}
-                  </span>
+              {winStreakData.map((item, i) => {
+                // Hari +1, wrap ke awal jika Sabtu
+                const nextDayIdx = (i + 1) % hariMinggu.length;
+                const nextDay = hariMinggu[nextDayIdx];
+                return (
                   <div
-                    className={cn(
-                      'flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300',
-                      item.isStreak
-                        ? 'bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg shadow-orange-300'
-                        : 'bg-gray-200'
-                    )}
+                    key={i}
+                    className="flex flex-col items-center gap-2 transition-transform hover:scale-110"
                   >
-                    {item.isStreak ? (
-                      <Flame className="h-7 w-7 text-white" />
-                    ) : (
-                      <div className="h-3 w-3 rounded-full bg-gray-400"></div>
-                    )}
+                    <span className="text-sm font-semibold text-gray-600">
+                      {nextDay}
+                    </span>
+                    <div
+                      className={cn(
+                        'flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300',
+                        item.isStreak
+                          ? 'bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg shadow-orange-300'
+                          : 'bg-gray-200'
+                      )}
+                    >
+                      {item.isStreak ? (
+                        <Flame className="h-7 w-7 text-white" />
+                      ) : (
+                        <div className="h-3 w-3 rounded-full bg-gray-400"></div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Card>
 
-        {/* Monthly Calendar */}
+        {/* Monthly Calendar + Hari */}
         <Card className="mb-8 overflow-hidden border-2 border-gray-200 p-0">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
             <h3 className="flex items-center gap-2 text-xl font-bold text-white">
@@ -244,12 +265,29 @@ export default function StreakTrackerPage() {
               Kalender Aktivitas Bulanan
             </h3>
           </div>
-          <div className="flex justify-center p-6">
+          <div className="flex flex-col items-center justify-center gap-2 p-6">
             <CalendarComponent
               mode="multiple"
-              selected={selectedDates} // Data langsung dari variabel, bukan state
+              selected={selectedDates}
               className="rounded-md border shadow"
             />
+            {/* Tampilkan hari dari tanggal yang sudah +1 */}
+            <div className="mt-4 w-full">
+              <h4 className="mb-2 text-center text-sm font-semibold text-indigo-700">
+                Hari dari tanggal streak (+1):
+              </h4>
+              <div className="flex flex-wrap justify-center gap-2">
+                {selectedDates.map((date, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-800"
+                  >
+                    {date.toLocaleDateString('id-ID')} -{' '}
+                    {hariIndo[date.getDay()]}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </Card>
 

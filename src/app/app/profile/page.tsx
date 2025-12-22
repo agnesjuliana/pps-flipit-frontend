@@ -9,26 +9,70 @@ import { LuMoveVertical } from 'react-icons/lu';
 
 import { useUserData } from '@/app/api/Auth/services';
 import logout from '@/app/api/Logout/action';
-import { useMonthlyStreak } from '@/app/api/Streak/services';
+
+import {
+  useMonthlyStreakV2,
+  useWeeklyStreakV2,
+  useCurrentStreak,
+} from '@/app/api/Streak/services';
 
 export default function ActivityPage() {
   const user = useUserData();
   const router = useRouter();
-  const {
-    data: monthlyStreakData = {
-      streakTotal: 0,
-      todayPlayTotal: 0,
-      flashcardTotal: 0,
-      streakMonth: [],
-    },
-    isLoading: isMonthlyStreakLoading,
-    isError: isMonthlyStreakError,
-    error: monthlyStreakError,
-  } = useMonthlyStreak();
 
-  if (isMonthlyStreakLoading) return <div>Loading...</div>;
-  if (isMonthlyStreakError)
-    return <div>Error: {monthlyStreakError.message}</div>;
+  // --- 1. FETCH DATA STREAK ---
+  const {
+    data: weeklyResponse,
+    isLoading: isWeeklyLoading,
+    isError: isWeeklyError,
+    error: weeklyError,
+  } = useWeeklyStreakV2();
+
+  const {
+    data: monthlyResponse,
+    isLoading: isMonthlyLoading,
+    isError: isMonthlyError,
+    error: monthlyError,
+  } = useMonthlyStreakV2();
+
+  const { data: currentStreakResponse, isLoading: isCurrentLoading } =
+    useCurrentStreak();
+
+  // --- 2. DATA PROCESSING ---
+  // A. Monthly Data & Calendar
+  const monthlyData = monthlyResponse?.data?.monthData || [];
+  const totalCorrectMonth = monthlyResponse?.data?.totalCorrect || 0;
+  // B. Today's Stats
+  const today = new Date().toLocaleDateString('en-CA');
+  const todayStats = monthlyData.find((d: any) => d.date === today);
+  const todayPlays = todayStats?.attempts || 0;
+  // C. Weekly Data Mapping
+  const winStreakData = [
+    { keyDay: 'Sun', day: 'Min', isStreak: false },
+    { keyDay: 'Mon', day: 'Sen', isStreak: false },
+    { keyDay: 'Tue', day: 'Sel', isStreak: false },
+    { keyDay: 'Wed', day: 'Rab', isStreak: false },
+    { keyDay: 'Thu', day: 'Kam', isStreak: false },
+    { keyDay: 'Fri', day: 'Jum', isStreak: false },
+    { keyDay: 'Sat', day: 'Sab', isStreak: false },
+  ];
+  const weeklyDataList = weeklyResponse?.data?.weekData || [];
+  if (Array.isArray(weeklyDataList)) {
+    weeklyDataList.forEach((item: { day: string; attempts: number }) => {
+      const index = winStreakData.findIndex((day) => day.keyDay === item.day);
+      if (index !== -1) {
+        winStreakData[index].isStreak = item.attempts > 0;
+      }
+    });
+  }
+  // D. Current Streak
+  const currentStreak = currentStreakResponse?.data?.streakCount ?? 0;
+  const streakPercentage = Math.min((currentStreak / 30) * 100, 100);
+
+  if (isWeeklyLoading || isMonthlyLoading || isCurrentLoading)
+    return <div>Loading...</div>;
+  if (isWeeklyError) return <div>Error Weekly: {weeklyError.message}</div>;
+  if (isMonthlyError) return <div>Error Monthly: {monthlyError.message}</div>;
 
   const handleLogout = async () => {
     try {
@@ -84,9 +128,6 @@ export default function ActivityPage() {
           </h4>
           <div className="grid w-full grid-cols-2 gap-2 sm:gap-3">
             <div className="col-span-2 grid place-items-center rounded-xl border py-2 sm:py-3">
-              {/* Stats content here */}
-            </div>
-            <div className="col-span-1 grid place-items-center rounded-xl border py-2 sm:py-3">
               <div className="flex flex-col items-center gap-1">
                 <div className="flex items-center gap-2">
                   <svg
@@ -107,12 +148,13 @@ export default function ActivityPage() {
                     />
                   </svg>
                   <h3 className="text-lg font-bold sm:text-2xl">
-                    {monthlyStreakData?.streakTotal}
+                    {currentStreak}
                   </h3>
                 </div>
                 <p className="text-xs text-[#A1A1AA]">Streak Harian</p>
               </div>
             </div>
+            {/* ...existing code for other cards... */}
             <div className="col-span-1 grid place-items-center rounded-xl border py-2 sm:py-3">
               <div className="flex flex-col items-center gap-1">
                 <div className="flex items-center gap-2">
@@ -130,13 +172,13 @@ export default function ActivityPage() {
                     />
                   </svg>
                   <h3 className="text-lg font-bold sm:text-2xl">
-                    {monthlyStreakData?.todayPlayTotal}
+                    {todayPlays}
                   </h3>
                 </div>
                 <p className="text-xs text-[#A1A1AA]">Repetisi Materi</p>
               </div>
             </div>
-            <div className="col-span-2 grid place-items-center rounded-xl border py-2 sm:py-3">
+            <div className="col-span-1 grid place-items-center rounded-xl border py-2 sm:py-3">
               <div className="flex flex-col items-center gap-1">
                 <div className="flex items-center gap-2">
                   <svg
@@ -159,7 +201,7 @@ export default function ActivityPage() {
                     />
                   </svg>
                   <h3 className="text-lg font-bold sm:text-2xl">
-                    {monthlyStreakData?.flashcardTotal}
+                    {totalCorrectMonth}
                   </h3>
                 </div>
                 <p className="text-xs text-[#A1A1AA]">Flash Cards</p>

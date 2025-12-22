@@ -32,6 +32,7 @@ const Page = () => {
   // --- 3. Data Processing ---
 
   // Template Data UI (Indonesian Days)
+  const hariMinggu = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
   const winStreakData = [
     { keyDay: 'Sun', day: 'Min', isStreak: false },
     { keyDay: 'Mon', day: 'Sen', isStreak: false },
@@ -138,13 +139,18 @@ const Page = () => {
 
             {/* Indicator Mingguan (DATA REAL DARI API) */}
             <div className="flex justify-between gap-2 sm:gap-3">
-              {winStreakData.map((item, i) => (
-                <StreakIndicator
-                  key={i}
-                  day={item.day}
-                  isStreak={item.isStreak}
-                />
-              ))}
+              {winStreakData.map((item, i) => {
+                // Hari +1, wrap ke awal jika Sabtu
+                const nextDayIdx = (i + 1) % hariMinggu.length;
+                const nextDay = hariMinggu[nextDayIdx];
+                return (
+                  <StreakIndicator
+                    key={i}
+                    day={nextDay}
+                    isStreak={item.isStreak}
+                  />
+                );
+              })}
             </div>
 
             {/* Tombol Menuju Quiz */}
